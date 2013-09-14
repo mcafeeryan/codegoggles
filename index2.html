@@ -1,0 +1,170 @@
+<html>
+	<head>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
+		<script type="text/javascript">
+			var data = {"type": "subtree",
+						"name": "select",
+						"arguments": [{"type": "subtree",
+									"name": "from",
+									"arguments": {"type": "string",
+												"name": "table_name"}},
+								{"type": "list",
+								"name": "where",
+								"arguments": {"type": "string",
+										"name": "x > 0 AND y &lt; 3"}}
+								]
+						};
+			var data2 = {"name":"R","children":[
+				{"name":"A","children":[
+					{"name":"A1"},{"name":"A2"}
+				]},
+				{"name":"B","children":[
+					{"name":"B1"},{"name":"B2"},{"name":"B3"}
+				]}
+			]};
+			
+			var query = {
+				"type": "select",
+				"items": [
+					{"type": "column", "table": "user", "name": "first_name"},
+					{"type": "column", "table": "user", "name": "last_name"},
+					{"type": "column", "table": "country", "name": "name"}
+				],
+				"from": {
+					"type": "join",
+					"items": [
+						{"type": "table", "name": "user", "columns": ["first_name", "last_name", "country_code", "age"]},
+						{"type": "table", "name": "country", "columns": ["code", "name"]}
+					],
+					"on": {
+						"type": "relation",
+						"operator": "=",
+						"items": [
+							{"type": "column", "table": "user", "name": "country_code"},
+							{"type": "column", "table": "country", "name": "code"}
+						]
+					}
+				},
+				"where": {
+					"type": "relation",
+					"operator": "IN",
+					"items": [
+						{"type": "column", "table": "country", "name": "name"},
+						{"type": "literal", "name": "('Kazakhstan', 'Burundi')"}
+					]
+				}
+			};
+			
+			var container, svg, tree;
+			
+			function getCols(d) {
+				if (d._cols) return d._cols;
+				
+				switch (d.type) {
+				case "join":
+					d._cols = getCols(d.items[0]).concat(getCols(d.items[1])); break;
+				case "select":
+					d._cols = getCols(d.from); break;
+				case "table":
+					d._cols = d.columns; break;
+				}
+				return d._cols;
+			}
+			
+			$(function() {
+				container = d3.select("#container");
+				
+				svg = container.append("svg:svg")
+				.attr("width", $(container[0]).width())
+				.attr("height", $(container[0]).height());
+			
+				tree = d3.layout.tree()
+				.size([$(container[0]).height(), $(container[0]).width()])
+				.children(function(node) {
+					switch (node.type) {
+					case "select":
+						return [node.from];
+					case "join":
+						return node.items;
+					}
+				});
+				
+				var nodes = tree.nodes(query);
+				var links = tree.links(nodes);
+				
+				container.selectAll("div.node").data(tree.nodes(query))
+				.enter().append("div").attr("class", "node")
+				.style("left", function(d) { return tree.size()[1]-d.y; })
+				.style("top", function(d) { return d.x; })
+				.html(function(d) {
+					var rows = [];
+					switch (d.type) {
+					case "join":
+						rows.push("<tr><th class='transient'>joined</th></tr>"); break;
+					case "select":
+						rows.push("<tr><th class='transient'>filtered</th></tr>"); break;
+					case "table":
+						rows.push("<tr><th>"+d.name+"</th></tr>");
+					}
+					$.each(getCols(d), function(i, e) {
+						rows.push("<tr><td>"+e+"</td></tr>");
+					});
+					return "<table>"+rows.join("")+"</table>";
+				});
+				
+				svg.selectAll("path")
+				.data(links)
+				.enter().append("svg:path")
+				.attr("class", "link")
+				.attr("d", d3.svg.diagonal().projection(function(d) { return [tree.size()[1]-d.y, d.x]; }))
+				.attr("fill", "none").attr("stroke", "#ccc");
+			});
+		</script>
+		<style type="text/css" media="screen">
+			* {
+				margin: 0em;
+				padding: 0em;
+			}
+			body {
+				font-family: Helvetica, Arial, sans-serif;
+			}
+			div.node {
+				position: absolute;
+			}
+			path.link {
+				fill: none;
+				stroke: #ccc;
+			}
+			#container {
+				position: relative;
+				width: 600px;
+				height: 500px;
+				margin: 0px auto;
+				border: 1px solid #ccc;
+			}
+			table {
+				border: 1px solid #ccc;
+				font-size: 0.8em;
+				border-collapse: collapse;
+			}
+			th, td {
+				padding: 1px;
+				border: 1px solid #eee;
+			}
+			th {
+				text-transform: uppercase;
+				background-color: #ccc;
+			}
+			th.transient {
+				font-weight: normal;
+				text-transform: none;
+				font-style: italic;
+				color: #fff;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="container"></div>
+	</body>
+</html>
