@@ -6,7 +6,7 @@ COLUMNS = ["Wildcard", "Identifier"]
 INFIX = ["in", "or", "and", "join"]
 NEST_ONE = ["from", "on"]
 
-DEBUG = True
+DEBUG = False
 
 RECURSIVE_OPERATIONS = False
 
@@ -91,7 +91,6 @@ def make_column(token):
 
 def make_table(token):
     name = token.to_unicode()
-    print name
     try:
         return {"type": "table", "name": name, "columns": TABLE_DEF[name]}
     except:
@@ -224,7 +223,6 @@ if 0:
         sample = sample.format(",(" + nested_sample + ")")
     sample.format("")
 
-print sample
 
 import sys
 try:
