@@ -127,9 +127,9 @@
 				}
 				return d._cols;
 			}
-			
-			$(function() {
-                $("#container").width(depth(query)*magic_constant)
+
+			function drawStuff(data) {
+				$("#container").width(depth(data)*magic_constant)
 				container = d3.select("#container");
 				
 				var width = $(container[0]).width()*0.7;
@@ -151,10 +151,10 @@
 					}
 				});
 				
-				var nodes = tree.nodes(query);
+				var nodes = tree.nodes(data);
 				var links = tree.links(nodes);
 				
-				container.selectAll("div.node").data(tree.nodes(query))
+				container.selectAll("div.node").data(tree.nodes(data))
 				.enter().append("div").attr("class", "node")
 				.style("left", function(d) { return tree.size()[1]-d.y; })
 				.style("top", function(d) { return d.x; })
@@ -219,7 +219,22 @@
 				  });
 				}
 				);
+			}
+	
+			$(function() {
+				drawStuff(query);
 			});
+
+			function formSubmit() {
+				var text = $("#input").text();
+				var response = $.ajax({
+					type: 'GET',
+					url: "http://localhost:4567/post?=".concat(text)
+				}).done(function (data) {
+					console.log(data);
+					drawStuff(data);
+				});
+			}
 
 		</script>
 		<style type="text/css" media="screen">
@@ -311,7 +326,7 @@ FROM user
 JOIN country ON user.country_code = country.code
 WHERE country.name IN ('Kazakhstan', 'Burundi')
 			</textarea>
-			<input type="button" id="submit" value="Go!" class="btn btn-primary btn-large">
+			<input type="button" onClick="formSubmit()" id="submit" value="Go!" class="btn btn-primary btn-large">
 		</div>
 		<div id="container"></div>
 	</body>
