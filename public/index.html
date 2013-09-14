@@ -209,21 +209,18 @@
 					drawStuff(uniqData);
 				});
 			}
-
-
-			function formExport() {
+			function openModal() {
 				var text = $("#input").val();
 				console.log(text);
+				var ret = "";
 				var response = $.ajax({
 					type: 'GET',
 					url: "http://localhost/post?sql=".concat(text.replace(/\n/g, " "))
 				}).done(function (uniqData) {
-					console.log(JSON.stringify(uniqData));
-					drawStuff(uniqData);
+					ret = JSON.stringify(uniqData);
 				});
+				return ret;
 			}
-
-			
 
 		</script>
 		<style type="text/css" media="screen">
@@ -335,6 +332,37 @@
 			.highlight_tr {
 				background-color: yellow;
 			}
+			.modalDialog {
+				position: fixed;
+				font-family: Arial, Helvetica, sans-serif;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
+				background: rgba(0,0,0,0.8);
+				z-index: 99999;
+				opacity:0;
+				-webkit-transition: opacity 400ms ease-in;
+				-moz-transition: opacity 400ms ease-in;
+				transition: opacity 400ms ease-in;
+				pointer-events: none;
+			}
+			.modalDialog:target {
+				opacity:1;
+				pointer-events: auto;
+			}
+
+			.modalDialog > div {
+				width: 400px;
+				position: relative;
+				margin: 10% auto;
+				padding: 5px 20px 13px 20px;
+				border-radius: 10px;
+				background: #fff;
+				background: -moz-linear-gradient(#fff, #999);
+				background: -webkit-linear-gradient(#fff, #999);
+				background: -o-linear-gradient(#fff, #999);
+			}
 		</style>
 	</head>
 	<body>
@@ -348,9 +376,21 @@ JOIN country ON country_code = code
 WHERE country.name IN ('Kazakhstan', 'Burundi')</textarea>
 <br>
 			<input type="button" onClick="formSubmit()" id="submit" value="Go!" class="btn btn-primary btn-large">
-			<input type="button" onClick="formExport()" id="export" value="Export" class="btn btn-primary btn-large">
+			<input type="button" onClick="" id="export" value="Export" class="btn btn-primary btn-large">
 			<input type="button" id="expandall" value="Minimize All" class="btn btn-primary btn-large">
 		</div>
+
+		<div id="openModal" class="modalDialog">
+	<div>
+		<a href="#close" title="Close" class="close">X</a>
+		<h2>JSON Object</h2>
+		<textarea id="output" rows="8" cols="40">
+		</textarea>
+		<script>
+		</script>
+	</div>
+</div>
+
 		</div>
 		<div id="container"></div>
 	</body>
