@@ -9,6 +9,8 @@ get '/' do
 end
 
 get '/post' do
+    headers \
+            "Access-Control-Allow-Origin"   => "*"
 	query = params["sql"]
 	content_type :json
 	`python pyparse.py \"#{query}\"`
