@@ -109,11 +109,12 @@
 				tree = d3.layout.tree()
 				.size([$(container[0]).height(), $(container[0]).width()])
 				.children(function(node) {
+					if (node._children) return node._children;
 					switch (node.type) {
 					case "select":
-						return [node.from];
+						return [{"type": "symbol", "symbol": "&pi;", "_children": [node.from]}];
 					case "join":
-						return node.items;
+						return [{"type": "symbol", "symbol": "&#x2A1D;", "_children": node.items}];
 					}
 				});
 				
@@ -127,6 +128,8 @@
 				.html(function(d) {
 					var rows = [];
 					switch (d.type) {
+					case "symbol":
+						return "<span class='symbol'>"+d.symbol+"</span>";
 					case "join":
 						rows.push("<tr><th class='transient'>" + getName(d) + "</th></tr>"); break;
 					case "select":
@@ -166,6 +169,15 @@
 				fill: none;
 				stroke: #ccc;
 			}
+			.symbol {
+				line-height: 1em;
+				font-size: 2em;
+				margin: -0.6em 0em 0em -0.5em;
+				padding: 2px;
+				background-color: white;
+				display: block;
+				font-family: Georgia, serif;
+			}
 			#container {
 				position: relative;
 				width: 900px;
@@ -178,10 +190,12 @@
 				border: 1px solid #ccc;
 				font-size: 0.8em;
 				border-collapse: collapse;
+				margin: -50% 0em 0em -50%;
 			}
 			th, td {
 				padding: 1px;
 				border: 1px solid #eee;
+				background-color: #fff;
 			}
 			th {
 				text-transform: uppercase;
