@@ -14,6 +14,7 @@ TABLE_DEF = {
     "country": ["name", "population", "capital", "gdp", "country_code"],
     "JOIN": ["SELECT", "JOIN", "ON", "GROUPBY", "COUNT", "SUM", "MIN", "MAX", "FROM"],
     "user": ["name", "country", "SSN", "password"],
+    "users": ["name", "country", "SSN", "password"],
     "table": ["Amount", "CustomerID", "PaymentDate", "MiscColumn"],
     "table1": ["Amount", "CustomerID", "PaymentDate", "MiscColumn"],
     "table2": ["Amount", "CustomerID", "PaymentDate", "MiscColumn"],
@@ -38,6 +39,19 @@ class TokenDuck(object):
 
     def to_unicode(self):
         return " ".join([thing.to_unicode() for thing in self.tokens])
+
+class IdentifierDuck(object):
+    def __init__(self, token):
+        self.token = token
+
+    def __getattr__(self, name):
+        return getattr(self.token, name)
+
+    def __str__(self):
+        return str(self.token)
+
+    def __repr__(self):
+        return "Identifier" + repr(self.token)
 
 def preprocess_sql(sql):
     return " ".join(sql.split())
@@ -80,6 +94,13 @@ def identifierlist_filter(tokens):
             new_tokens.append(token)
     return new_tokens
 
+def after_from_keyword_to_identifier(tokens):
+    for idx in range(len(tokens)):
+        token = tokens[idx]
+        if "Keyword" in repr(token) and "from" == str(token).lower():
+            tokens[idx + 1] = IdentifierDuck(tokens[idx + 1])
+    return tokens
+
 def create_dict(stmt, intermediate, preprocess=True):
     if DEBUG:
         print stmt
@@ -87,6 +108,7 @@ def create_dict(stmt, intermediate, preprocess=True):
     tokens = identifierlist_filter(tokens)
     tokens = whitespace_filter(tokens)
     tokens = punctuation_filter(tokens)
+    tokens = after_from_keyword_to_identifier(tokens)
     if preprocess:
         tokens = preprocess_infix(tokens)
         tokens = preprocess_nesting(tokens)
@@ -202,6 +224,7 @@ def parse_token(tokens, token, intermediate):
     if "items" not in intermediate:
         intermediate["items"] = []
 
+    print token, repr(token)
     intermediate["items"].append(make_literal(token))
 
 
