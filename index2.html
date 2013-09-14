@@ -1,0 +1,295 @@
+<html>
+	<head>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
+		<script type="text/javascript">
+			var data = {"type": "subtree",
+						"name": "select",
+						"arguments": [{"type": "subtree",
+									"name": "from",
+									"arguments": {"type": "string",
+												"name": "table_name"}},
+								{"type": "list",
+								"name": "where",
+								"arguments": {"type": "string",
+										"name": "x > 0 AND y &lt; 3"}}
+								]
+						};
+			var data2 = {"name":"R","children":[
+				{"name":"A","children":[
+					{"name":"A1"},{"name":"A2"}
+				]},
+				{"name":"B","children":[
+					{"name":"B1"},{"name":"B2"},{"name":"B3"}
+				]}
+			]};
+			
+			var query = {
+				"type": "select",
+				"items": [
+					{"type": "column", "table": "user", "name": "first_name"},
+					{"type": "column", "table": "user", "name": "last_name"},
+					{"type": "column", "table": "country", "name": "name"}
+				],
+				"from": {
+					"type": "join",
+					"items": [
+						{"type": "table", "name": "user", "columns": ["first_name", "last_name", "country_code", "age"]},
+						{"type": "table", "name": "country", "columns": ["code", "name"]}
+					],
+					"on": {
+						"type": "relation",
+						"operator": "=",
+						"items": [
+							{"type": "column", "table": "user", "name": "country_code"},
+							{"type": "column", "table": "country", "name": "code"}
+						]
+					}
+				},
+				"where": {
+					"type": "relation",
+					"operator": "IN",
+					"items": [
+						{"type": "column", "table": "country", "name": "name"},
+						{"type": "literal", "name": "('Kazakhstan', 'Burundi')"}
+					]
+				}
+			};
+
+            var magic_constant = 400
+			var container, svg, tree;
+	
+            function depth(data) {
+                var d = 0
+                if (data.type === "select") {
+                    return depth(data.from) +1
+                }
+                if (data.type === "join") {
+                    for (var i = 0; i < data.items.length; i++) {
+                        if (depth(data.items[i]) > d) {
+                            d = depth(data.items[i])
+                        }
+                    }
+                }
+                return d+1
+            }
+
+            function getName(data) {
+                if (data.type === "select") {
+                    s = "<b>SELECT</b>"
+                    if (data.where) {
+                        s += " WHERE "
+                        s += "<span class='identifier'>"+data.where.items[0].name+"</span>"
+                        s += " "
+                        s += data.where.operator
+                        s += " "
+                        s += "<span class='identifier'>"+data.where.items[1].name+"</span>"
+                    }
+                }
+                if (data.type === "join") {
+                    s = "<b>JOIN</b> ON "
+                    s += "<span class='identifier'>"+data.on.items[0].table
+                    s += "."
+                    s += data.on.items[0].name+"</span>"
+                    s += " "
+                    s += data.on.operator
+                    s += " "
+                    s += "<span class='identifier'>"+data.on.items[1].table
+                    s += "."
+                    s += data.on.items[1].name+"</span>"
+                }
+                return s
+            }
+
+			function getCols(d) {
+				if (d._cols) return d._cols;
+				
+				switch (d.type) {
+				case "join":
+					var cols = [].concat(getCols(d.items[0]));
+					cols.splice(cols.indexOf(d.on.items[0].name), 1);
+					var mid = cols.length;
+					cols = cols.concat(getCols(d.items[1]))
+					cols.splice(cols.indexOf(d.on.items[1].name), 1);
+					cols.splice(mid, 0, d.on.items[0].name+","+d.on.items[1].name);
+					cols = cols;
+					d._cols = cols;
+					break;
+				case "select":
+					var cols = [];
+					for (var i = 0; i < d.items.length; i++) {
+						cols.push(d.items[i].name);
+					}
+					d._cols = cols; break;
+				case "table":
+					d._cols = d.columns; break;
+				}
+				return d._cols;
+			}
+			
+			$(function() {
+                $("#container").width(depth(query)*magic_constant)
+				container = d3.select("#container");
+				
+				var width = $(container[0]).width()*0.7;
+				var height = $(container[0]).height();
+				
+				svg = container.append("svg:svg")
+				.attr("width", width)
+				.attr("height", height);
+			
+				tree = d3.layout.tree()
+				.size([height, width])
+				.children(function(node) {
+					if (node._children) return node._children;
+					switch (node.type) {
+					case "select":
+						return [{"type": "symbol", "symbol": "&pi;", "_children": [node.from]}];
+					case "join":
+						return [{"type": "symbol", "symbol": "&#x2A1D;", "_children": node.items}];
+					}
+				});
+				
+				var nodes = tree.nodes(query);
+				var links = tree.links(nodes);
+				
+				container.selectAll("div.node").data(tree.nodes(query))
+				.enter().append("div").attr("class", "node")
+				.style("left", function(d) { return tree.size()[1]-d.y; })
+				.style("top", function(d) { return d.x; })
+				.html(function(d) {
+					var rows = [];
+					switch (d.type) {
+					case "symbol":
+						return "<span class='symbol'>"+d.symbol+"</span>";
+					case "join":
+						rows.push("<tr><th class='transient'>" + getName(d) + "</th></tr>"); break;
+					case "select":
+						rows.push("<tr><th class='transient'>" + getName(d) + "</th></tr>"); break;
+					case "table":
+						rows.push("<tr><th><span class='identifier'>"+d.name+"</span></th></tr>");
+					}
+					$.each(getCols(d), function(i, e) {
+						rows.push("<tr><td>"+e+"</td></tr>");
+					});
+					return "<table>"+rows.join("")+"</table>";
+				})
+				
+				svg.selectAll("path")
+				.data(links)
+				.enter().append("svg:path")
+				.attr("class", "link")
+				.attr("d", d3.svg.diagonal().projection(function(d) { return [tree.size()[1]-d.y, d.x]; }))
+				.attr("fill", "none")
+				.attr("stroke", "#ccc");
+
+				  $('td').hover(function(){
+				  $(this).parent().addClass('highlight_tr');
+
+				  var text = $(this).parent().find('td').text();
+				  var strSplit = text.split(",");
+
+				  $('td').each(function(){
+                    strSplit2 = $(this).text().split(",")
+				  	for (var i = 0; i < strSplit.length; i++) {
+                        for (var j=0; j < strSplit2.length; j++) {
+                            if(strSplit2[j] === strSplit[i]) {
+                                $(this).addClass('highlight_tr');
+                            }
+                        }
+                    }
+				  });
+
+				  },function(){
+				  $(this).parent().removeClass('highlight_tr');
+
+				  var text = $(this).parent().find('td').text();
+				  var strSplit = text.split(",");
+
+				  $('td').each(function(){
+                    strSplit2 = $(this).text().split(",")
+				  	for (var i = 0; i < strSplit.length; i++) {
+                        for (var j=0; j < strSplit2.length; j++) {
+                            if(strSplit2[j] === strSplit[i]) {
+                                $(this).removeClass('highlight_tr');
+                            }
+                        }
+				  	}
+				  });
+				}
+				);
+			});
+
+		</script>
+		<style type="text/css" media="screen">
+			* {
+				margin: 0em;
+				padding: 0em;
+			}
+			body {
+				font-family: Helvetica, Arial, sans-serif;
+			}
+			div.node {
+				position: absolute;
+			}
+			path.link {
+				fill: none;
+				stroke: #ccc;
+				stroke-width: 2px;
+			}
+			.symbol {
+				line-height: 1em;
+				font-size: 2em;
+				margin: -0.6em 0em 0em -0.5em;
+				padding: 2px;
+				background-color: white;
+				display: block;
+				font-family: Georgia, serif;
+			}
+			#container {
+				position: relative;
+				width: 80%;
+				height: 100%;
+				margin: 0em auto;
+				/*border: 1px solid #ccc;*/
+			}
+			table {
+				/*width: 100%;*/
+				border: 1px solid #ccc;
+				font-size: 0.8em;
+				border-collapse: collapse;
+				margin: -3em 0em 0em -50%;
+				display: block;
+			}
+			th, td {
+				padding-left: 10px;
+				padding-right: 10px;
+				padding: 3px;
+				border: 1px solid #ccc;
+				background-color: #fff;
+			}
+			td, .identifier {
+				font-family: Consolas, monospace;
+			}
+			th {
+				background-color: #48c;
+				border: 1px solid #666;
+				color: #fff;
+				font-size: 1.2em;
+				padding: 5px 5px 0px;
+			}
+			th.transient {
+				background-color: #4c8;
+				font-weight: normal;
+				text-transform: none;
+				font-style: italic;
+			}
+			.highlight_tr {
+				background-color: yellow;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="container"></div>
+	</body>
+</html>
