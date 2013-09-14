@@ -5,7 +5,7 @@
 		<script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
 		<script type="text/javascript">
 
-            var magic_constant = 600
+            var magic_constant = 650
 			var container, svg, tree;
 	
             function depth(data) {
@@ -104,19 +104,21 @@
 				var links = tree.links(nodes);
 				
 				container.selectAll("div.node").data(tree.nodes(data))
-				.enter().append("div").attr("class", "node")
+				.enter().append("div").attr("class", function(d){ return "node "+d.type.toLowerCase()+"-node"; })
 				.style("left", function(d) { return tree.size()[1]-d.y; })
 				.style("top", function(d) { return d.x; })
 				.html(function(d) {
 					var rows = [];
 					switch (d.type.toLowerCase()) {
 					case "symbol":
-						return "<span class='symbol'>"+d.symbol+"</span>";
+						out = "<div><div class='symbol'>"+d.symbol+"</div>";
+						out += "<div class='detail'>"+(d.parent.on || d.parent.where)+"</div></div>";
+						return out;
                     case "join":
 					case "inner join":
-						rows.push("<tr><th class='transient'>" + d.type.toUpperCase() + "</th></tr>"); break;
+						rows.push("<tr><th class='transient'>" + d.type.toUpperCase() + "ED</th></tr>"); break;
 					case "select":
-						rows.push("<tr><th class='transient'>" + d.type.toUpperCase() + "</th></tr>"); break;
+						rows.push("<tr><th class='transient'>" + d.type.toUpperCase() + "ED</th></tr>"); break;
 					case "table":
 						rows.push("<tr><th><span class='identifier'>"+d.name+"</span></th></tr>");
 
@@ -124,17 +126,6 @@
 					$.each(getCols(d), function(i, e) {
 						rows.push("<tr><td>"+e+"</td></tr>");
 					});
-
-					if (d.type.toLowerCase() === "select") {
-	                    if (d.where) {
-      						rows.push("<tr><th class='extra'>"+"WHERE"+"</th></tr>");
-      						rows.push("<tr><td>"+d.where+"</td></tr>");
-	                    }
-	                }
-	                if (d.type.toLowerCase() === "join" || d.type.toLowerCase() === "inner join") {
-	                	rows.push("<tr><th class='extra'>"+"ON"+"</th></tr>");
-	                	rows.push("<tr><td class='ignore'>"+d.on+"</td></tr>");
-	                }
 
 					return "<table>"+rows.join("")+"</table>";
 				})
@@ -182,6 +173,13 @@
 				  });
 				}
 				);
+				$('th').click(function() {
+			       $(this).parents('table').find('td').toggle();
+			       console.log("wtf");
+			    }); 
+			    $('#expandall').click(function(){
+			    	$('td').toggle();
+			    });
 			}
 	
 			// $(function() {
@@ -200,13 +198,7 @@
 				});
 			}
 
-				// $('.node td').hide();
-				$('th').click(function() {
-			       $(this).parents('table').find('td').toggle();
-			    }); 
-			    $('#expandall').click(function(){
-			    	$('td').toggle();
-			    });
+			
 
 		</script>
 		<style type="text/css" media="screen">
@@ -245,6 +237,7 @@
 			}
 			div.node {
 				position: absolute;
+				text-align: center;
 			}
 			path.link {
 				fill: none;
@@ -254,11 +247,20 @@
 			.symbol {
 				line-height: 1em;
 				font-size: 2em;
-				margin: -0.6em 0em 0em -0.5em;
 				padding: 2px;
-				background-color: white;
-				display: block;
+				display: inline-block;
 				font-family: Georgia, serif;
+				background-color: white;
+			}
+			.symbol-node > div {
+				width: 80px;
+				margin: -20% -50%;
+			}
+			.detail {
+				font-size: 0.8em;
+				line-height: 1.1em;
+				text-align: center;
+				font-family: Consolas, monospace;
 			}
 			#container {
 				position: relative;
@@ -280,7 +282,6 @@
 				padding: 3px;
 				border: 1px solid #ccc;
 				background-color: #fff;
-				text-align: center;
 			}
 			td, .identifier {
 				font-family: Consolas, monospace;
