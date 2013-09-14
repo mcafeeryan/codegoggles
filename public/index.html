@@ -291,7 +291,7 @@ var query = {
 				console.log(text);
 				var response = $.ajax({
 					type: 'GET',
-					url: "http://localhost:8080/post?sql=".concat(text.replace(/\n/g, " "))
+					url: "http://localhost/post?sql=".concat(text.replace(/\n/g, " "))
 				}).done(function (uniqData) {
 					console.log(JSON.stringify(uniqData));
 					drawStuff(uniqData);
