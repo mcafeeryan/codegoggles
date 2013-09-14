@@ -60,22 +60,13 @@
 				switch (d.type.toLowerCase()) {
 				case "join":
                 case "inner join":
-                    d._cols = []
-                    if (!d.on || !d.on.items) {
-                        d._cols = getCols(d.parent.parent)
-                        for (var i = 0; i < d._cols.length; i++) {
-                            if (d._cols[i] && d._cols[i].indexOf("*") >= 0) {
-                                d._cols.splice(i, 1)
-                            }
-                        }
-                        break
-                    }
+					var joinitems = d.on.split("=");
 					var cols = [].concat(getCols(d.items[0]));
-					cols.splice(cols.indexOf(d.on.items[0].name), 1);
+					cols.splice(cols.indexOf(joinitems[0].name), 1);
 					var mid = cols.length;
 					cols = cols.concat(getCols(d.items[1]))
-					cols.splice(cols.indexOf(d.on.items[1].name), 1);
-					cols.splice(mid, 0, d.on.items[0].name+","+d.on.items[1].name);
+					cols.splice(cols.indexOf(joinitems[1].name), 1);
+					cols.splice(mid, 0, joinitems[0].name+","+joinitems[1].name);
 					cols = cols;
 					d._cols = cols;
 					break;
