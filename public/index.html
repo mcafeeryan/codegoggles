@@ -248,6 +248,20 @@
 			#top {
 				margin: 5em 5em 0em;
 			}
+			#logo {
+				width: 130px;
+				height: 66px;
+			}
+			#head {
+				margin: 0px auto;
+				width: 500px;
+			}
+			h1 {
+				display: inline-block;
+				position: relative;
+				top: 0.4em;
+				margin-bottom: 2em;
+			}
 			#submit {
 				outline: none;
 			}
@@ -326,12 +340,12 @@
 	</head>
 	<body>
 		<div id="top">
+			<div id="head"><img src="logo.png" id="logo"><h1>SQL Goggles</h1></div>
 			<textarea id="input" rows="8" cols="40">
 SELECT user.first_name, user.last_name, country.name
 FROM user
 JOIN country ON user.country_code = country.code
-WHERE country.name IN ('Kazakhstan', 'Burundi')
-			</textarea>
+WHERE country.name IN ('Kazakhstan', 'Burundi')</textarea>
 			<input type="button" id="submit" value="Go!" class="btn btn-primary btn-large">
 		</div>
 		<div id="container"></div>
