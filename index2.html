@@ -116,7 +116,11 @@
 					d._cols = cols;
 					break;
 				case "select":
-					d._cols = getCols(d.from); break;
+					var cols = [];
+					for (var i = 0; i < d.items.length; i++) {
+						cols.push(d.items[i].name);
+					}
+					d._cols = cols; break;
 				case "table":
 					d._cols = d.columns; break;
 				}
