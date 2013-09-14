@@ -102,12 +102,15 @@
 			$(function() {
 				container = d3.select("#container");
 				
+				var width = $(container[0]).width()*0.7;
+				var height = $(container[0]).height();
+				
 				svg = container.append("svg:svg")
-				.attr("width", $(container[0]).width())
-				.attr("height", $(container[0]).height());
+				.attr("width", width)
+				.attr("height", height);
 			
 				tree = d3.layout.tree()
-				.size([$(container[0]).height(), $(container[0]).width()])
+				.size([height, width])
 				.children(function(node) {
 					if (node._children) return node._children;
 					switch (node.type) {
@@ -162,9 +165,6 @@
 			div.node {
 				position: absolute;
 			}
-            body :nth-child(2){
-                width: 40%
-            }
 			path.link {
 				fill: none;
 				stroke: #ccc;
@@ -180,17 +180,17 @@
 			}
 			#container {
 				position: relative;
-				width: 900px;
-				height: 500px;
-                margin-left: 100px;
-                margin-right: auto;
+				width: 80%;
+				height: 100%;
+				margin: 0em auto;
 				/*border: 1px solid #ccc;*/
 			}
 			table {
 				border: 1px solid #ccc;
 				font-size: 0.8em;
 				border-collapse: collapse;
-				margin: -50% 0em 0em -50%;
+				margin: -3em 0em 0em -50%;
+				display: block;
 			}
 			th, td {
 				padding: 1px;
