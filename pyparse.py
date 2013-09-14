@@ -6,7 +6,7 @@ COLUMNS = ["Wildcard", "Identifier"]
 INFIX = ["in", "or", "and", "join"]
 NEST_ONE = ["from", "on"]
 
-DEBUG = True
+DEBUG = False
 
 RECURSIVE_OPERATIONS = False
 
