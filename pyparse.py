@@ -54,7 +54,8 @@ class IdentifierDuck(object):
         return "Identifier" + repr(self.token)
 
 def preprocess_sql(sql):
-    return " ".join(sql.split())
+    sql = " ".join(sql.split())
+    return sql
 
 def parse_statement(sql):
     sql = preprocess_sql(sql)
@@ -227,6 +228,36 @@ def parse_token(tokens, token, intermediate):
     print token, repr(token)
     intermediate["items"].append(make_literal(token))
 
+def recursive_dot_removal_dict(target_dict):
+    for key in target_dict:
+        if isinstance(target_dict[key], dict):
+            target_dict[key] = recursive_dot_removal_dict(target_dict[key])
+        elif isinstance(target_dict[key], list):
+            target_dict[key] = recursive_dot_removal_list(target_dict[key])
+        else:
+            target_dict[key] = dot_removal(target_dict[key])
+    return target_dict
+
+
+
+def recursive_dot_removal_list(target_list):
+    for key in range(len(target_list)):
+        if isinstance(target_list[key], dict):
+            target_list[key] = recursive_dot_removal_dict(target_list[key])
+        elif isinstance(target_list[key], list):
+            target_list[key] = recursive_dot_removal_list(target_list[key])
+        else:
+            target_list[key] = dot_removal(target_list[key])
+    return target_list
+
+def dot_removal(target_string):
+    return target_string.split('.')[-1]
+
+def to_json(stmt):
+    target_dict = create_dict(stmt, {})
+    target_dict = recursive_dot_removal_dict(target_dict)
+    target_json = json.dumps(target_dict)
+    return target_json
 
 sample = """SELECT Count(*),CustomerID,
   PaymentDate,
@@ -268,7 +299,7 @@ except:
     pass
 
 stmt = parse_statement(sample)
-print json.dumps(create_dict(stmt, {}))
+print to_json(stmt)
 
 if DEBUG:
     tokens = stmt.tokens
