@@ -247,10 +247,10 @@
 				console.log(text);
 				var response = $.ajax({
 					type: 'GET',
-					url: "http://localhost:4567/post?=".concat(text)
-				}).done(function (data) {
-					console.log(JSON.stringify(data));
-					drawStuff(data);
+					url: "http://localhost/post?=".concat(text)
+				}).done(function (uniqData) {
+					console.log(JSON.stringify(uniqData));
+					drawStuff(uniqData);
 				});
 			}
 
@@ -261,7 +261,6 @@
 			    $('#expandall').click(function(){
 			    	$('td').toggle();
 			    });
-			});
 
 		</script>
 		<style type="text/css" media="screen">
@@ -373,7 +372,6 @@
 SELECT user.first_name, user.last_name, country.name
 FROM user
 JOIN country ON user.country_code = country.code
-
 WHERE country.name IN ('Kazakhstan', 'Burundi')</textarea>
 			<input type="button" onClick="formSubmit()" id="submit" value="Go!" class="btn btn-primary btn-large">
 
