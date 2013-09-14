@@ -67,10 +67,21 @@ function update(source) {
 
   // Compute the flattened node list. TODO use d3.layout.hierarchy.
   var nodes = tree.nodes(root);
+  tree.separtion = function(a,b) {
+        return name(a).length + name(b).length
+  }
+  root.x = 0
+  root.y = 0
+  root.height = barHeight
   
   // Compute the "layout".
   nodes.forEach(function(n, i) {
-    n.x = i * barHeight;
+    if (!n.parent) {
+        return
+    }
+    n.height = n.parent.height
+    n.x = n.parent.x + n.parent.height + barHeight
+    n.y = 0
   });
   
   // Update the nodes…
@@ -86,7 +97,7 @@ function update(source) {
   nodeEnter.append("svg:rect")
       .attr("y", -barHeight / 2)
       .attr("height", barHeight)
-      .attr("width", barWidth)
+      .attr("width", function(d) {return name(d).length * 7})
       .style("fill", color)
       .on("click", click);
   
