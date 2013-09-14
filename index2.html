@@ -145,7 +145,6 @@
 					});
 					return "<table>"+rows.join("")+"</table>";
 				})
-				.on("click", click);
 				
 				svg.selectAll("path")
 				.data(links)
@@ -154,10 +153,7 @@
 				.attr("d", d3.svg.diagonal().projection(function(d) { return [tree.size()[1]-d.y, d.x]; }))
 				.attr("fill", "none")
 				.attr("stroke", "#ccc");
-			});
 
-			// Toggle children on click.
-			function click(d) {
 				  $('td').hover(function(){
 				  $(this).parent().addClass('highlight_tr');
 
@@ -183,7 +179,7 @@
 				  });
 				}
 				);
-			}
+			});
 
 		</script>
 		<style type="text/css" media="screen">
