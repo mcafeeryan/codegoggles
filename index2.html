@@ -24,8 +24,89 @@
 					{"name":"B1"},{"name":"B2"},{"name":"B3"}
 				]}
 			]};
-			
-			var query = {
+		
+var query = {
+  "items": [
+    {
+      "type": "literal",
+      "name": "Count(*)"
+    },
+    {
+      "type": "table",
+      "name": "CustomerID"
+    },
+    {
+      "type": "table",
+      "name": "PaymentDate"
+    },
+    {
+      "type": "table",
+      "name": "Amount"
+    }
+  ],
+  "type": "SELECT",
+  "where": {
+    "relation": {
+      "items": [
+        {
+          "relation": {
+            "items": [
+              {
+                "type": "literal",
+                "name": "x"
+              },
+              {
+                "type": "literal",
+                "name": "4"
+              }
+            ],
+            "type": ">"
+          }
+        },
+        {
+          "relation": {
+            "items": [
+              {
+                "items": [
+                  {
+                    "type": "literal",
+                    "name": "l"
+                  }
+                ]
+              },
+              {
+                "items": [
+                  {
+                    "type": "column",
+                    "name": "'a', 'b'"
+                  }
+                ]
+              }
+            ],
+            "type": "in"
+          }
+        }
+      ],
+      "type": "and"
+    }
+  },
+  "from": {
+    "items": [
+      {
+        "type": "table",
+        "name": "table2"
+      },
+      {
+        "type": "table",
+        "name": "table1"
+      }
+    ],
+    "type": "INNEr JOIN"
+  }
+}
+
+	
+			var query2 = {
 				"type": "select",
 				"items": [
 					{"type": "column", "table": "user", "name": "first_name"},
@@ -74,6 +155,19 @@
                 }
                 return d+1
             }
+ 
+            function calc_children(node) {
+                if (node._children) return node._children;
+                switch (node.type.toLowerCase()) {
+                case "select":
+                    return [{"type": "symbol", "symbol": "&pi;", "_children": [node.from]}];
+                case "join":
+                case "inner join":
+                    return [{"type": "symbol", "symbol": "&#x2A1D;", "_children": node.items}];
+                }
+            }
+				
+
 
             function getName(data) {
                 if (data.type === "select") {
@@ -105,8 +199,18 @@
 			function getCols(d) {
 				if (d._cols) return d._cols;
 				
-				switch (d.type) {
+				switch (d.type.toLowerCase()) {
 				case "join":
+                case "inner join":
+                    if (!d.on) {
+                        d._cols = getCols(d.parent.parent)
+                        for (var i = 0; i < d._cols.length; i++) {
+                            if (d._cols[i].indexOf("*") >= 0) {
+                                d._cols.splice(i, 1)
+                            }
+                        }
+                        break
+                    }
 					var cols = [].concat(getCols(d.items[0]));
 					cols.splice(cols.indexOf(d.on.items[0].name), 1);
 					var mid = cols.length;
@@ -123,6 +227,23 @@
 					}
 					d._cols = cols; break;
 				case "table":
+                    if (!d.columns) {
+                        c = getCols(d.parent.parent)
+                        s = d.parent._children.indexOf(d)
+                        console.log(s)
+                        console.log(c)
+                        if (s) {
+                            f = [c[0]]
+                            c = c.slice(2)
+                            c = f.concat(c)
+                        }
+                        else {
+                            c = c.slice(0, 2)
+                        }
+                        console.log(c)
+                        d.columns = c
+
+                    }
 					d._cols = d.columns; break;
 				}
 				return d._cols;
@@ -141,17 +262,9 @@
 			
 				tree = d3.layout.tree()
 				.size([height, width])
-				.children(function(node) {
-					if (node._children) return node._children;
-					switch (node.type) {
-					case "select":
-						return [{"type": "symbol", "symbol": "&pi;", "_children": [node.from]}];
-					case "join":
-						return [{"type": "symbol", "symbol": "&#x2A1D;", "_children": node.items}];
-					}
-				});
-				
-				var nodes = tree.nodes(query);
+				.children(calc_children)
+                   
+                var nodes = tree.nodes(query);
 				var links = tree.links(nodes);
 				
 				container.selectAll("div.node").data(tree.nodes(query))
@@ -160,10 +273,11 @@
 				.style("top", function(d) { return d.x; })
 				.html(function(d) {
 					var rows = [];
-					switch (d.type) {
+					switch (d.type.toLowerCase()) {
 					case "symbol":
 						return "<span class='symbol'>"+d.symbol+"</span>";
-					case "join":
+                    case "join":
+					case "inner join":
 						rows.push("<tr><th class='transient'>" + d.type.toUpperCase() + "</th></tr>"); break;
 					case "select":
 						rows.push("<tr><th class='transient'>" + d.type.toUpperCase() + "</th></tr>"); break;
@@ -183,7 +297,7 @@
       						rows.push("<tr><td class='ignore'>"+d.where.items[1].name+"</td></tr>");
 	                    }
 	                }
-	                if (d.type === "join") {
+	                if (d.type === "join" || d.type == "inner join") {
 	                	rows.push("<tr><th class='extra'>"+"ON"+"</th></tr>");
 	                	rows.push("<tr><td class='ignore'>"+d.on.items[0].name+d.on.operator+d.on.items[1].name+"</td></tr>");
 	                }
