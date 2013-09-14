@@ -173,13 +173,16 @@ var query = {
 				switch (d.type.toLowerCase()) {
 				case "join":
                 case "inner join":
-					var joinitems = d.on.split("=");
+					var joinItems = d.on.split("=");
+					for (var i = 0; i < joinItems.length; i++) {
+						joinItems[i] = joinItems[i].trim();
+					}
 					var cols = [].concat(getCols(d.items[0]));
-					cols.splice(cols.indexOf(joinitems[0].name), 1);
+					cols.splice(cols.indexOf(joinItems[0]), 1);
 					var mid = cols.length;
 					cols = cols.concat(getCols(d.items[1]))
-					cols.splice(cols.indexOf(joinitems[1].name), 1);
-					cols.splice(mid, 0, joinitems[0].name+","+joinitems[1].name);
+					cols.splice(cols.indexOf(joinItems[1]), 1);
+					cols.splice(mid, 0, joinItems[0]+","+joinItems[1]);
 					cols = cols;
 					d._cols = cols;
 					break;
