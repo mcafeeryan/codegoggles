@@ -71,14 +71,23 @@ def preprocess_nesting(tokens):
                     on_next = True
     return tokens
 
+def identifierlist_filter(tokens):
+    new_tokens = []
+    for token in tokens:
+        if "IdentifierList" in repr(token):
+            new_tokens += token.tokens
+        else:
+            new_tokens.append(token)
+    return new_tokens
 
 def create_dict(stmt, intermediate, preprocess=True):
     if DEBUG:
         print stmt
     tokens = stmt.tokens
+    tokens = identifierlist_filter(tokens)
+    tokens = whitespace_filter(tokens)
+    tokens = punctuation_filter(tokens)
     if preprocess:
-        tokens = whitespace_filter(tokens)
-        tokens = punctuation_filter(tokens)
         tokens = preprocess_infix(tokens)
         tokens = preprocess_nesting(tokens)
     while tokens:
@@ -223,6 +232,10 @@ if 0:
         sample = sample.format(",(" + nested_sample + ")")
     sample.format("")
 
+sample = """SELECT first_name, last_name, name
+FROM user
+JOIN country ON country_code = code
+WHERE name IN ('Kazakhstan', 'Burundi')"""
 
 import sys
 try:
@@ -236,6 +249,7 @@ print json.dumps(create_dict(stmt, {}))
 
 if DEBUG:
     tokens = stmt.tokens
+    tokens = identifierlist_filter(tokens)
     tokens = whitespace_filter(tokens)
     tokens = punctuation_filter(tokens)
     tokens = preprocess_infix(tokens)
