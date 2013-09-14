@@ -1,5 +1,6 @@
 <html>
 	<head>
+		<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" type="text/css">
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 		<script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
 		<script type="text/javascript">
@@ -229,6 +230,15 @@
 			body {
 				font-family: Helvetica, Arial, sans-serif;
 			}
+			#top {
+				margin: 5em 5em 0em;
+			}
+			textarea {
+				width: 90%;
+				height: 7em;
+				vertical-align: top;
+				font-family: Consolas, monospace;
+			}
 			div.node {
 				position: absolute;
 			}
@@ -267,9 +277,13 @@
 				padding: 3px;
 				border: 1px solid #ccc;
 				background-color: #fff;
+				text-align: center;
 			}
 			td, .identifier {
 				font-family: Consolas, monospace;
+			}
+			td.operator {
+				font-weight: bold;
 			}
 			th {
 				background-color: #48c;
@@ -290,6 +304,15 @@
 		</style>
 	</head>
 	<body>
+		<div id="top">
+			<textarea id="input" rows="8" cols="40">
+SELECT user.first_name, user.last_name, country.name
+FROM user
+JOIN country ON user.country_code = country.code
+WHERE country.name IN ('Kazakhstan', 'Burundi')
+			</textarea>
+			<input type="button" id="submit" value="Go!" class="btn btn-primary btn-large">
+		</div>
 		<div id="container"></div>
 	</body>
 </html>
