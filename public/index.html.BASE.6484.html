@@ -138,7 +138,7 @@ var query = {
 				}
 			};
 
-            var magic_constant = 600
+            var magic_constant = 400
 			var container, svg, tree;
 	
             function depth(data) {
@@ -248,9 +248,9 @@ var query = {
 				}
 				return d._cols;
 			}
-
-			function drawStuff(data) {
-				$("#container").width(depth(data)*magic_constant)
+			
+			$(function() {
+                $("#container").width(depth(query)*magic_constant)
 				container = d3.select("#container");
 				
 				var width = $(container[0]).width()*0.7;
@@ -262,13 +262,12 @@ var query = {
 			
 				tree = d3.layout.tree()
 				.size([height, width])
-
 				.children(calc_children)
                    
-				var nodes = tree.nodes(data);
+				var nodes = tree.nodes(query);
 				var links = tree.links(nodes);
 				
-				container.selectAll("div.node").data(tree.nodes(data))
+				container.selectAll("div.node").data(tree.nodes(query))
 				.enter().append("div").attr("class", "node")
 				.style("left", function(d) { return tree.size()[1]-d.y; })
 				.style("top", function(d) { return d.x; })
@@ -349,24 +348,6 @@ var query = {
 				  });
 				}
 				);
-			}
-	
-			// $(function() {
-			// 	drawStuff(query);
-			// });
-
-			function formSubmit() {
-				var text = $("#input").text();
-				console.log(text);
-				var response = $.ajax({
-					type: 'GET',
-					url: "http://localhost/post?=".concat(text)
-				}).done(function (uniqData) {
-					console.log(JSON.stringify(uniqData));
-					drawStuff(uniqData);
-				});
-			}
-
 				// $('.node td').hide();
 				$('th').click(function() {
 			       $(this).parents('table').find('td').toggle();
@@ -374,6 +355,7 @@ var query = {
 			    $('#expandall').click(function(){
 			    	$('td').toggle();
 			    });
+			});
 
 		</script>
 		<style type="text/css" media="screen">
@@ -487,8 +469,7 @@ FROM user
 JOIN country ON user.country_code = country.code
 WHERE country.name IN ('Kazakhstan', 'Burundi')</textarea>
 			<input type="button" id="submit" value="Go!" class="btn btn-primary btn-large">
-			<input type="button" id="expandall" value="Minimize All" class="btn btn-primary btn-large">
-		</div>
+			<input type="button" id="expandall" value="Expand All" class="btn btn-primary btn-large">
 		</div>
 		<div id="container"></div>
 	</body>

@@ -24,119 +24,6 @@
 					{"name":"B1"},{"name":"B2"},{"name":"B3"}
 				]}
 			]};
-		
-var query = {
-  "items": [
-    {
-      "type": "literal",
-      "name": "Count(*)"
-    },
-    {
-      "type": "table",
-      "name": "CustomerID"
-    },
-    {
-      "type": "table",
-      "name": "PaymentDate"
-    },
-    {
-      "type": "table",
-      "name": "Amount"
-    }
-  ],
-  "type": "SELECT",
-  "where": {
-    "relation": {
-      "items": [
-        {
-          "relation": {
-            "items": [
-              {
-                "type": "literal",
-                "name": "x"
-              },
-              {
-                "type": "literal",
-                "name": "4"
-              }
-            ],
-            "type": ">"
-          }
-        },
-        {
-          "relation": {
-            "items": [
-              {
-                "items": [
-                  {
-                    "type": "literal",
-                    "name": "l"
-                  }
-                ]
-              },
-              {
-                "items": [
-                  {
-                    "type": "column",
-                    "name": "'a', 'b'"
-                  }
-                ]
-              }
-            ],
-            "type": "in"
-          }
-        }
-      ],
-      "type": "and"
-    }
-  },
-  "from": {
-    "items": [
-      {
-        "type": "table",
-        "name": "table2"
-      },
-      {
-        "type": "table",
-        "name": "table1"
-      }
-    ],
-    "type": "INNEr JOIN"
-  }
-}
-
-	
-			var query2 = {
-				"type": "select",
-				"items": [
-					{"type": "column", "table": "user", "name": "first_name"},
-					{"type": "column", "table": "user", "name": "last_name"},
-					{"type": "column", "table": "country", "name": "name"}
-				],
-				"from": {
-					"type": "join",
-					"items": [
-						{"type": "table", "name": "user", "columns": ["first_name", "last_name", "country_code", "age"]},
-						{"type": "table", "name": "country", "columns": ["code", "name"]}
-					],
-					"on": {
-						"type": "relation",
-						"operator": "=",
-						"items": [
-							{"type": "column", "table": "user", "name": "country_code"},
-							{"type": "column", "table": "country", "name": "code"}
-						]
-					}
-				},
-				"where": {
-					"type": "relation",
-					"operator": "IN",
-					"items": [
-						{"type": "column", "table": "country", "name": "name"},
-						{"type": "literal", "name": "('Kazakhstan', 'Burundi')"}
-					]
-				}
-			};
 
             var magic_constant = 600
 			var container, svg, tree;
@@ -486,9 +373,14 @@ SELECT user.first_name, user.last_name, country.name
 FROM user
 JOIN country ON user.country_code = country.code
 WHERE country.name IN ('Kazakhstan', 'Burundi')</textarea>
+
 			<input type="button" id="submit" value="Go!" class="btn btn-primary btn-large">
 			<input type="button" id="expandall" value="Minimize All" class="btn btn-primary btn-large">
-		</div>
+
+			<input type="button" onClick="formSubmit()" id="submit" value="Go!" class="btn btn-primary btn-large">
+
+			<input type="button" id="expandall" value="Expand All" class="btn btn-primary btn-large">
+
 		</div>
 		<div id="container"></div>
 	</body>

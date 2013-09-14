@@ -6,7 +6,18 @@ COLUMNS = ["Wildcard", "Identifier"]
 INFIX = ["in", "or", "and", "join"]
 NEST_ONE = ["from", "on"]
 
-DEBUG = False
+DEBUG = True
+
+RECURSIVE_OPERATIONS = False
+
+TABLE_DEF = {
+    "country": ["name", "population", "capital", "gdp", "country_code"],
+    "JOIN": ["SELECT", "JOIN", "ON", "GROUPBY", "COUNT", "SUM", "MIN", "MAX", "FROM"],
+    "user": ["name", "country", "SSN", "password"],
+    "table": ["Amount", "CustomerID", "PaymentDate", "MiscColumn"],
+    "table1": ["Amount", "CustomerID", "PaymentDate", "MiscColumn"],
+    "table2": ["Amount", "CustomerID", "PaymentDate", "MiscColumn"],
+}
 
 class TokenDuck(object):
     def __init__(self, token, tokens):
@@ -25,7 +36,14 @@ class TokenDuck(object):
     def __repr__(self):
         return repr(self.token)
 
+    def to_unicode(self):
+        return " ".join([thing.to_unicode() for thing in self.tokens])
+
+def preprocess_sql(sql):
+    return " ".join(sql.split())
+
 def parse_statement(sql):
+    sql = preprocess_sql(sql)
     return sqlparse.parse(sql)[0]
 
 def whitespace_filter(tokens):
@@ -72,10 +90,18 @@ def make_column(token):
     return {"type": "column", "name": token.to_unicode()}
 
 def make_table(token):
-    return {"type": "table", "name": token.to_unicode()}
+    name = token.to_unicode()
+    print name
+    try:
+        return {"type": "table", "name": name, "columns": TABLE_DEF[name]}
+    except:
+        return {"type": "column", "name": name}
 
 def make_literal(token):
     return {"type": "literal", "name": token.to_unicode()}
+
+def is_join(token):
+    return isinstance(token, TokenDuck)
 
 def preprocess_infix(tokens):
     for infix in INFIX:
@@ -118,7 +144,10 @@ def parse_token(tokens, token, intermediate):
 
     if "Where" in repr(token):
         token.tokens.pop(0)
-        intermediate['where'] = create_dict(token, {})
+        if RECURSIVE_OPERATIONS:
+            intermediate['where'] = create_dict(token, {})
+        else:
+            intermediate['where'] = token.to_unicode()
         return
 
     if "Parenthesis" in repr(token):
@@ -128,7 +157,10 @@ def parse_token(tokens, token, intermediate):
         return
 
     if "Keyword" in repr(token) and "on" == str(token).lower():
-        intermediate['on'] = create_dict(token, {}, False)
+        if RECURSIVE_OPERATIONS:
+            intermediate['on'] = create_dict(token, {}, False)
+        else:
+            intermediate['on'] = token.to_unicode()
         return
 
     if "Function" in repr(token):
@@ -138,7 +170,11 @@ def parse_token(tokens, token, intermediate):
         return
 
     if "from" == str(token).lower():
-        intermediate['from'] = create_dict(token, {"type": "table"}, False)
+        # TODO special case join
+        if is_join(token.tokens[0]):
+            intermediate['from'] = create_dict(token, {"type": "table"}, False)
+        else:
+            intermediate['from'] = make_table(token.tokens[0])
         return
 
     for infix in INFIX:
@@ -177,9 +213,23 @@ FROM table1 INNEr JOIN table2 oN x = 3
 WHERE x > 4 AND y = 'STRING JOIN SELECT FROM' OR l in ('a', 'b')
 """
 
+if 0:
+    nested_sample = """SELECT Count(*){}
+    FROM table1 INNEr JOIN table2 oN x = 3
+    WHERE x > 4 AND y = 'STRING JOIN SELECT FROM' OR l in ('a', 'b')
+    """
+
+    sample = nested_sample
+    for _ in range(10):
+        sample = sample.format(",(" + nested_sample + ")")
+    sample.format("")
+
+print sample
+
 import sys
 try:
     sample = sys.argv[1]
+    DEBUG = False
 except:
     pass
 
