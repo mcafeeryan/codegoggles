@@ -25,37 +25,37 @@
 				]}
 			]};
 			
-			var query = {
-				"type": "select",
-				"items": [
-					{"type": "column", "table": "user", "name": "first_name"},
-					{"type": "column", "table": "user", "name": "last_name"},
-					{"type": "column", "table": "country", "name": "name"}
-				],
-				"from": {
-					"type": "join",
-					"items": [
-						{"type": "table", "name": "user", "columns": ["first_name", "last_name", "country_code", "age"]},
-						{"type": "table", "name": "country", "columns": ["code", "name"]}
-					],
-					"on": {
-						"type": "relation",
-						"operator": "=",
-						"items": [
-							{"type": "column", "table": "user", "name": "country_code"},
-							{"type": "column", "table": "country", "name": "code"}
-						]
-					}
-				},
-				"where": {
-					"type": "relation",
-					"operator": "IN",
-					"items": [
-						{"type": "column", "table": "country", "name": "name"},
-						{"type": "literal", "name": "('Kazakhstan', 'Burundi')"}
-					]
-				}
-			};
+			// var query = {
+			// 	"type": "select",
+			// 	"items": [
+			// 		{"type": "column", "table": "user", "name": "first_name"},
+			// 		{"type": "column", "table": "user", "name": "last_name"},
+			// 		{"type": "column", "table": "country", "name": "name"}
+			// 	],
+			// 	"from": {
+			// 		"type": "join",
+			// 		"items": [
+			// 			{"type": "table", "name": "user", "columns": ["first_name", "last_name", "country_code", "age"]},
+			// 			{"type": "table", "name": "country", "columns": ["code", "name"]}
+			// 		],
+			// 		"on": {
+			// 			"type": "relation",
+			// 			"operator": "=",
+			// 			"items": [
+			// 				{"type": "column", "table": "user", "name": "country_code"},
+			// 				{"type": "column", "table": "country", "name": "code"}
+			// 			]
+			// 		}
+			// 	},
+			// 	"where": {
+			// 		"type": "relation",
+			// 		"operator": "IN",
+			// 		"items": [
+			// 			{"type": "column", "table": "country", "name": "name"},
+			// 			{"type": "literal", "name": "('Kazakhstan', 'Burundi')"}
+			// 		]
+			// 	}
+			// };
 
             var magic_constant = 400
 			var container, svg, tree;
@@ -236,9 +236,9 @@
 				);
 			}
 	
-			$(function() {
-				drawStuff(query);
-			});
+			// $(function() {
+			// 	drawStuff(query);
+			// });
 
 			function formSubmit() {
 				var text = $("#input").text();
@@ -246,7 +246,7 @@
 					type: 'GET',
 					url: "http://localhost:4567/post?=".concat(text)
 				}).done(function (data) {
-					console.log(data);
+					console.log(JSON.stringify(data));
 					drawStuff(data);
 				});
 			}
