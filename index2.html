@@ -90,7 +90,14 @@
 				
 				switch (d.type) {
 				case "join":
-					d._cols = getCols(d.items[0]).concat(getCols(d.items[1])); break;
+					var cols = getCols(d.items[0]);
+					cols.splice(cols.indexOf(d.on.items[0].name), 1);
+					var mid = cols.length;
+					cols = cols.concat(getCols(d.items[1]))
+					cols.splice(cols.indexOf(d.on.items[1].name), 1);
+					cols.splice(mid, 0, d.on.items[0].name+","+d.on.items[1].name);
+					cols = cols;
+					d._cols = cols; break;
 				case "select":
 					d._cols = getCols(d.from); break;
 				case "table":
