@@ -184,11 +184,12 @@ var query = {
 
 			function drawStuff(data) {
 				$("#container").width(depth(data)*magic_constant)
+                $("#container").empty()
 				container = d3.select("#container");
 				
 				var width = $(container[0]).width()*0.7;
 				var height = $(container[0]).height();
-				
+
 				svg = container.append("svg:svg")
 				.attr("width", width)
 				.attr("height", height);
