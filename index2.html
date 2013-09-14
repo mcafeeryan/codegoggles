@@ -55,9 +55,25 @@
 					]
 				}
 			};
-			
+
+            var magic_constant = 400
 			var container, svg, tree;
-		
+	
+            function depth(data) {
+                var d = 0
+                if (data.type === "select") {
+                    return depth(data.from) +1
+                }
+                if (data.type === "join") {
+                    for (var i = 0; i < data.items.length; i++) {
+                        if (depth(data.items[i]) > d) {
+                            d = depth(data.items[i])
+                        }
+                    }
+                }
+                return d+1
+            }
+
             function getName(data) {
                 if (data.type === "select") {
                     s = "<b>SELECT</b>"
@@ -107,6 +123,7 @@
 			}
 			
 			$(function() {
+                $("#container").width(depth(query)*magic_constant)
 				container = d3.select("#container");
 				
 				var width = $(container[0]).width()*0.7;
