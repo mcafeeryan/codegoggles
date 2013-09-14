@@ -34,9 +34,18 @@ function clean(data) {
 }
 
 function name(data) {
-    s = data.type
+  
+    s = data.type.toUpperCase()
     if (data.type === "select") {
+        s+= " " + data.items[0].name
+        for (var i = 1; i <data.items.length; i++){
+          s += ", "
+          s += data.items[i].name
+        }
+        
         if (data.where) {
+            s += " "
+            s += "WHERE"
             s += " "
             s += data.where.items[0].name
             s += " "

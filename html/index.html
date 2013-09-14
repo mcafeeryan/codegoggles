@@ -1,9 +1,30 @@
 <html>
 <head>
+<style type="text/css">
 
+.node rect {
+  cursor: pointer;
+  fill: #333;
+  fill-opacity: .5;
+  stroke: #3182bd;
+  stroke-width: 1.5px;
+}
+
+.node text {
+  font: 10px sans-serif;
+  pointer-events: none;
+}
+
+path.link {
+  fill: none;
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+</style>
+</head>
 <body >
 <div id="chart"></div>
-<script src=/js/d3.v3.min.js> </script>
-<script src=/js/proc.js></script>
+<script src=../js/d3.v3.min.js> </script>
+<script src=../js/proc.js></script>
 </body>
 </html>
