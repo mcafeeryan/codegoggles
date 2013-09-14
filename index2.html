@@ -205,17 +205,14 @@
 				  var strSplit = text.split(",");
 
 				  $('td').each(function(){
+                    strSplit2 = $(this).text().split(",")
 				  	for (var i = 0; i < strSplit.length; i++) {
-					  	if($(this).text() === strSplit[i]) {
-					  		$(this).addClass('highlight_tr');
-					  	}
-
-					  	if($(this).text() === text)	{
-					  		$(this).addClass('highlight_tr');
-					  	}
-
-
-				  	}
+                        for (var j=0; j < strSplit2.length; j++) {
+                            if(strSplit2[j] === strSplit[i]) {
+                                $(this).addClass('highlight_tr');
+                            }
+                        }
+                    }
 				  });
 
 				  },function(){
@@ -225,17 +222,14 @@
 				  var strSplit = text.split(",");
 
 				  $('td').each(function(){
+                    strSplit2 = $(this).text().split(",")
 				  	for (var i = 0; i < strSplit.length; i++) {
-					  	if($(this).text() === strSplit[i]) {
-					  		$(this).removeClass('highlight_tr');
-					  	}					
+                        for (var j=0; j < strSplit2.length; j++) {
+                            if(strSplit2[j] === strSplit[i]) {
+                                $(this).removeClass('highlight_tr');
+                            }
+                        }
 				  	}
-
-				  	if($(this).text() === text)	{
-				  		$(this).removeClass('highlight_tr');
-				  	}
-
-				  	
 				  });
 				}
 				);
