@@ -123,7 +123,7 @@
 					switch (d.type.toLowerCase()) {
 					case "symbol":
 						out = "<div><div class='symbol'>"+d.symbol+"</div>";
-						out += "<div class='detail'>"+(d.parent.on || d.parent.where)+"</div></div>";
+						out += "<div class='detail'>"+(d.parent.on || d.parent.where || "")+"</div></div>";
 						return out;
                     case "join":
 					case "inner join":
