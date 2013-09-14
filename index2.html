@@ -105,21 +105,53 @@
 					case "select":
 						rows.push("<tr><th class='transient'>filtered</th></tr>"); break;
 					case "table":
-						rows.push("<tr><th>"+d.name+"</th></tr>");
+						rows.push("<tr><th>"+ d.name+"</th></tr>");
 					}
 					$.each(getCols(d), function(i, e) {
 						rows.push("<tr><td>"+e+"</td></tr>");
 					});
 					return "<table>"+rows.join("")+"</table>";
-				});
+				})
+				.on("click", click);
 				
 				svg.selectAll("path")
 				.data(links)
 				.enter().append("svg:path")
 				.attr("class", "link")
 				.attr("d", d3.svg.diagonal().projection(function(d) { return [tree.size()[1]-d.y, d.x]; }))
-				.attr("fill", "none").attr("stroke", "#ccc");
+				.attr("fill", "none")
+				.attr("stroke", "#ccc");
 			});
+
+			// Toggle children on click.
+			function click(d) {
+				  $('td').hover(function(){
+				  $(this).parent().addClass('highlight_tr');
+
+				  var text = $(this).parent().find('td').text();
+
+				  $('td').each(function(){
+				  	console.log($(this).text());
+				  	if($(this).text() === text) {
+				  		$(this).addClass('highlight_tr');
+				  	}
+				  });
+
+				  },function(){
+				  $(this).parent().removeClass('highlight_tr');
+
+				  var text = $(this).parent().find('td').text();
+
+				  $('td').each(function(){
+				  	console.log($(this).text());
+				  	if($(this).text() === text) {
+				  		$(this).removeClass('highlight_tr');
+				  	}
+				  });
+				}
+				);
+			}
+
 		</script>
 		<style type="text/css" media="screen">
 			* {
@@ -155,12 +187,16 @@
 			th {
 				text-transform: uppercase;
 				background-color: #ccc;
+
 			}
 			th.transient {
 				font-weight: normal;
 				text-transform: none;
 				font-style: italic;
 				color: #fff;
+			}
+			.highlight_tr {
+				background-color: yellow;
 			}
 		</style>
 	</head>
