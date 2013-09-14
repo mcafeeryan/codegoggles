@@ -235,7 +235,8 @@ def recursive_dot_removal_dict(target_dict):
         elif isinstance(target_dict[key], list):
             target_dict[key] = recursive_dot_removal_list(target_dict[key])
         else:
-            target_dict[key] = dot_removal(target_dict[key])
+            if key not in ("where", "on"):
+                target_dict[key] = dot_removal(target_dict[key])
     return target_dict
 
 
