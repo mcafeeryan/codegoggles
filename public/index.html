@@ -5,7 +5,7 @@
 		<script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
 		<script type="text/javascript">
 
-            var magic_constant = 600
+            var magic_constant = 650
 			var container, svg, tree;
 	
             function depth(data) {
@@ -181,6 +181,13 @@
 				  });
 				}
 				);
+				$('th').click(function() {
+			       $(this).parents('table').find('td').toggle();
+			       console.log("wtf");
+			    }); 
+			    $('#expandall').click(function(){
+			    	$('td').toggle();
+			    });
 			}
 	
 			// $(function() {
@@ -199,13 +206,7 @@
 				});
 			}
 
-				// $('.node td').hide();
-				$('th').click(function() {
-			       $(this).parents('table').find('td').toggle();
-			    }); 
-			    $('#expandall').click(function(){
-			    	$('td').toggle();
-			    });
+			
 
 		</script>
 		<style type="text/css" media="screen">
