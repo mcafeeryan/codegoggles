@@ -31,6 +31,8 @@
                 case "join":
                 case "inner join":
                     return [{"type": "symbol", "symbol": "&#x2A1D;", "_children": node.items}];
+                case "outer join":
+                    return [{"type": "symbol", "symbol": "&#x27D5;", "_children": node.items}];
                 }
             }
 
@@ -40,6 +42,7 @@
 				switch (d.type.toLowerCase()) {
 				case "join":
                 case "inner join":
+                case "outer join":
 					var joinItems = d.on.split("=");
 					for (var i = 0; i < joinItems.length; i++) {
 						joinItems[i] = joinItems[i].trim();
@@ -117,10 +120,12 @@
 						return out;
                     case "join":
 					case "inner join":
+					case "outer join":
 						rows.push("<tr><th class='transient'>" + d.type.toUpperCase() + "ED</th></tr>"); break;
 					case "select":
 						rows.push("<tr><th class='transient'>" + d.type.toUpperCase() + "ED</th></tr>"); break;
 					case "table":
+					case "column":
 						rows.push("<tr><th><span class='identifier'>"+d.name+"</span></th></tr>");
 
 					}
