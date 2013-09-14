@@ -165,11 +165,19 @@
 				  $(this).parent().addClass('highlight_tr');
 
 				  var text = $(this).parent().find('td').text();
+				  var strSplit = text.split(",");
 
 				  $('td').each(function(){
-				  	console.log($(this).text());
-				  	if($(this).text() === text) {
-				  		$(this).addClass('highlight_tr');
+				  	for (var i = 0; i < strSplit.length; i++) {
+					  	if($(this).text() === strSplit[i]) {
+					  		$(this).addClass('highlight_tr');
+					  	}
+
+					  	if($(this).text() === text)	{
+					  		$(this).addClass('highlight_tr');
+					  	}
+
+
 				  	}
 				  });
 
@@ -177,12 +185,20 @@
 				  $(this).parent().removeClass('highlight_tr');
 
 				  var text = $(this).parent().find('td').text();
+				  var strSplit = text.split(",");
 
 				  $('td').each(function(){
-				  	console.log($(this).text());
-				  	if($(this).text() === text) {
+				  	for (var i = 0; i < strSplit.length; i++) {
+					  	if($(this).text() === strSplit[i]) {
+					  		$(this).removeClass('highlight_tr');
+					  	}					
+				  	}
+
+				  	if($(this).text() === text)	{
 				  		$(this).removeClass('highlight_tr');
 				  	}
+
+				  	
 				  });
 				}
 				);
