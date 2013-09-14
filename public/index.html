@@ -138,7 +138,7 @@ var query = {
 				}
 			};
 
-            var magic_constant = 400
+            var magic_constant = 600
 			var container, svg, tree;
 	
             function depth(data) {
@@ -469,7 +469,7 @@ FROM user
 JOIN country ON user.country_code = country.code
 WHERE country.name IN ('Kazakhstan', 'Burundi')</textarea>
 			<input type="button" id="submit" value="Go!" class="btn btn-primary btn-large">
-			<input type="button" id="expandall" value="Expand All" class="btn btn-primary btn-large">
+			<input type="button" id="expandall" value="Minimize All" class="btn btn-primary btn-large">
 		</div>
 		<div id="container"></div>
 	</body>
