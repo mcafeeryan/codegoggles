@@ -179,7 +179,7 @@ var query = {
                     }
 					d._cols = d.columns; break;
 				}
-				return d._cols;
+				return d._cols || [];
 			}
 
 			function drawStuff(data) {
