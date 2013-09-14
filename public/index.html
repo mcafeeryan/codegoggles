@@ -3,7 +3,6 @@
 		<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" type="text/css">
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 		<script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
-        <script src="http://underscorejs.org/underscore-min.js" charset="utf-8"></script>
 		<script type="text/javascript">
 
             var magic_constant = 650
@@ -80,9 +79,6 @@
                     }
 					d._cols = d.columns; break;
 				}
-                if (d._cols) {
-                    d._cols = _.uniq(d._cols)
-                }
 				return d._cols || [];
 			}
 
