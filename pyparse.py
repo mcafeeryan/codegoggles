@@ -217,7 +217,7 @@ sample = """SELECT Count(*),CustomerID,
     FROM table
     WHERE CustomerID = CustomerID
     AND PaymentDate <= PaymentDate)
-FROM table1 INNEr JOIN table2 oN x = 3
+FROM table1 INNEr JOIN table2 oN CustomerID = CustomerID
 WHERE x > 4 AND y = 'STRING JOIN SELECT FROM' OR l in ('a', 'b')
 """
 
