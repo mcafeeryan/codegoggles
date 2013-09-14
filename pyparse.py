@@ -12,6 +12,7 @@ RECURSIVE_OPERATIONS = False
 
 TABLE_DEF = {
     "country": ["name", "population", "capital", "gdp", "country_code"],
+    "join": ["SELECT", "JOIN", "ON", "GROUPBY", "COUNT", "SUM", "MIN", "MAX", "FROM"],
     "JOIN": ["SELECT", "JOIN", "ON", "GROUPBY", "COUNT", "SUM", "MIN", "MAX", "FROM"],
     "user": ["name", "country", "SSN", "password"],
     "users": ["name", "country", "SSN", "password"],
@@ -98,7 +99,7 @@ def identifierlist_filter(tokens):
 def after_from_keyword_to_identifier(tokens):
     for idx in range(len(tokens)):
         token = tokens[idx]
-        if "Keyword" in repr(token) and "from" == str(token).lower():
+        if "Keyword" in repr(token) and "from" == str(token).lower() and "Parenthesis" not in repr(tokens[idx + 1]):
             tokens[idx + 1] = IdentifierDuck(tokens[idx + 1])
     return tokens
 
@@ -152,7 +153,7 @@ def parse_relation(token):
 
 def parse_token(tokens, token, intermediate):
     if DEBUG:
-        print "token:", token
+        print "token:", token, repr(token)
     for column in COLUMNS:
         if column in repr(token):
             if "items" not in intermediate:
@@ -287,17 +288,18 @@ if 0:
         sample = sample.format(",(" + nested_sample + ")")
     sample.format("")
 
-sample = """SELECT first_name, last_name, name
-FROM user
+sample = """SELECT user.first_name, user.last_name, country.name
+FROM (SELECT user.first_name, user.last_name, country.name
+FROM users)
 JOIN country ON country_code = code
-WHERE name IN ('Kazakhstan', 'Burundi')"""
+WHERE country.name IN ('Kazakhstan', 'Burundi')"""
 
 import sys
 try:
     sample = sys.argv[1]
     DEBUG = False
 except:
-    pass
+    DEBUG = True
 
 stmt = parse_statement(sample)
 print to_json(stmt)
