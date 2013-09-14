@@ -60,27 +60,27 @@
 		
             function getName(data) {
                 if (data.type === "select") {
-                    s = "SELECT"
+                    s = "<b>SELECT</b>"
                     if (data.where) {
                         s += " WHERE "
-                        s += data.where.items[0].name
+                        s += "<span class='identifier'>"+data.where.items[0].name+"</span>"
                         s += " "
                         s += data.where.operator
                         s += " "
-                        s += data.where.items[1].name
+                        s += "<span class='identifier'>"+data.where.items[1].name+"</span>"
                     }
                 }
                 if (data.type === "join") {
-                    s = "JOIN ON "
-                    s += data.on.items[0].table
+                    s = "<b>JOIN</b> ON "
+                    s += "<span class='identifier'>"+data.on.items[0].table
                     s += "."
-                    s += data.on.items[0].name
+                    s += data.on.items[0].name+"</span>"
                     s += " "
                     s += data.on.operator
                     s += " "
-                    s += data.on.items[1].table
+                    s += "<span class='identifier'>"+data.on.items[1].table
                     s += "."
-                    s += data.on.items[1].name
+                    s += data.on.items[1].name+"</span>"
                 }
                 return s
             }
@@ -138,7 +138,7 @@
 					case "select":
 						rows.push("<tr><th class='transient'>" + getName(d) + "</th></tr>"); break;
 					case "table":
-						rows.push("<tr><th>"+ d.name+"</th></tr>");
+						rows.push("<tr><th><span class='identifier'>"+d.name+"</span></th></tr>");
 					}
 					$.each(getCols(d), function(i, e) {
 						rows.push("<tr><td>"+e+"</td></tr>");
@@ -196,6 +196,7 @@
 			path.link {
 				fill: none;
 				stroke: #ccc;
+				stroke-width: 2px;
 			}
 			.symbol {
 				line-height: 1em;
@@ -222,22 +223,27 @@
 				display: block;
 			}
 			th, td {
-				padding: 1px;
 				padding-left: 10px;
 				padding-right: 10px;
-				border: 1px solid #eee;
+				padding: 3px;
+				border: 1px solid #ccc;
 				background-color: #fff;
 			}
+			td, .identifier {
+				font-family: Consolas, monospace;
+			}
 			th {
-				text-transform: uppercase;
-				background-color: #ccc;
-
+				background-color: #48c;
+				border: 1px solid #666;
+				color: #fff;
+				font-size: 1.2em;
+				padding: 5px 5px 0px;
 			}
 			th.transient {
-				font-weight: bold;
+				background-color: #4c8;
+				font-weight: normal;
 				text-transform: none;
-				font-style: none;
-				color: #aa0a0a;
+				font-style: italic;
 			}
 			.highlight_tr {
 				background-color: yellow;
