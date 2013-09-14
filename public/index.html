@@ -177,15 +177,15 @@
 
 					if (d.type === "select") {
 	                    if (d.where) {
-      						rows.push("<tr><th class='transient'>"+"WHERE"+"</th></tr>");
+      						rows.push("<tr><th class='extra'>"+"WHERE"+"</th></tr>");
       						rows.push("<tr><td>"+d.where.items[0].name+"</td></tr>");
-      						rows.push("<tr><th class='transient'>"+d.where.operator+"</th></tr>");
-      						rows.push("<tr><td>"+d.where.items[1].name+"</td></tr>");
+      						rows.push("<tr><th class='extra'>"+d.where.operator+"</th></tr>");
+      						rows.push("<tr><td class='ignore'>"+d.where.items[1].name+"</td></tr>");
 	                    }
 	                }
 	                if (d.type === "join") {
-	                	rows.push("<tr><th class='transient'>"+"ON"+"</th></tr>");
-	                	rows.push("<tr><td>"+d.on.items[0].name+d.on.operator+d.on.items[1].name+"</td></tr>");
+	                	rows.push("<tr><th class='extra'>"+"ON"+"</th></tr>");
+	                	rows.push("<tr><td class='ignore'>"+d.on.items[0].name+d.on.operator+d.on.items[1].name+"</td></tr>");
 	                }
 
 					return "<table>"+rows.join("")+"</table>";
@@ -199,13 +199,13 @@
 				.attr("fill", "none")
 				.attr("stroke", "#ccc");
 
-				  $('td').hover(function(){
+				  $('td[class!=ignore]').hover(function(){
 				  $(this).parent().addClass('highlight_tr');
 
 				  var text = $(this).parent().find('td').text();
 				  var strSplit = text.split(",");
 
-				  $('td').each(function(){
+				  $('td[class!=ignore]').each(function(){
                     strSplit2 = $(this).text().split(",")
 				  	for (var i = 0; i < strSplit.length; i++) {
                         for (var j=0; j < strSplit2.length; j++) {
@@ -248,6 +248,9 @@
 			#top {
 				margin: 5em 5em 0em;
 			}
+			#submit {
+				outline: none;
+			}
 			textarea {
 				width: 90%;
 				height: 7em;
@@ -276,10 +279,8 @@
 				width: 80%;
 				height: 100%;
 				margin: 0em auto;
-				/*border: 1px solid #ccc;*/
 			}
 			table {
-				/*width: 100%;*/
 				border: 1px solid #ccc;
 				font-size: 0.8em;
 				border-collapse: collapse;
@@ -302,16 +303,21 @@
 			}
 			th {
 				background-color: #48c;
-				border: 1px solid #666;
 				color: #fff;
 				font-size: 1.2em;
-				padding: 5px 5px 0px;
+				padding-bottom: 2px;
+			}
+			tr:first-child th {
+				border: 1px solid #666;
 			}
 			th.transient {
 				background-color: #4c8;
 				font-weight: bold;
 				text-transform: none;
 				font-style: none;
+			}
+			th.extra {
+				background-color: #ccc;
 			}
 			.highlight_tr {
 				background-color: yellow;
