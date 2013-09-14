@@ -18,7 +18,46 @@ var vis = d3.select("#chart").append("svg:svg")
   .append("svg:g")
     .attr("transform", "translate(20,30)");
 
-d3.json("/raw/sql.json", function(json) {
+function clean(data) {
+    if (data.type === "select") {
+        data.children = [clean(data.from)]
+    }
+
+    if (data.type === "join") {
+        data.children = []
+        for (var i = 0; i < data.items.length; i++) {
+            data.children.push(clean(data.items[i]))
+        }
+    }
+    data.name = name(data)
+    return data
+}
+
+function name(data) {
+    s = data.type
+    if (data.type === "select") {
+        if (data.where) {
+            s += " "
+            s += data.where.items[0].name
+            s += " "
+            s += data.where.operator
+            s += " "
+            s += data.where.items[1].name
+        }
+    }
+
+    if (data.type === "join") {
+        s += " "
+        s += data.on.items[0].name
+        s += " "
+        s += data.on.operator
+        s += " "
+        s += data.on.items[1].name
+    }
+    return s
+}
+d3.json("/raw/sql_example.json", function(json) {
+  json = clean(json)
   json.x0 = 0;
   json.y0 = 0;
   update(root = json);

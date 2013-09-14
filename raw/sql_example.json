@@ -1,0 +1,31 @@
+{
+    "type": "select",
+    "items": [
+        {"type": "column", "table": "user", "name": "first_name"},
+        {"type": "column", "table": "user", "name": "last_name"},
+        {"type": "column", "table": "country", "name": "name"}
+    ],
+    "from": {
+        "type": "join",
+        "items": [
+            {"type": "table", "name": "user"},
+            {"type": "table", "name": "country"}
+        ],
+        "on": {
+            "type": "relation",
+            "operator": "=",
+            "items": [
+                {"type": "column", "table": "user", "name": "country_code"},
+                {"type": "column", "table": "country", "name": "code"}
+            ]
+        }
+    },
+    "where": {
+        "type": "relation",
+        "operator": "IN",
+        "items": [
+            {"type": "column", "table": "country", "name": "name"},
+            {"type": "literal", "name": "('Kazakhstan', 'Burundi')"}
+        ]
+    }
+}
