@@ -54,7 +54,8 @@ function update(source) {
   nodeEnter.append("svg:text")
       .attr("dy", 3.5)
       .attr("dx", 5.5)
-      .text(function(d) { return d.name; });
+      .text(function(d) { return d.name; })
+      .on("click", click);
   
   // Transition nodes to their new position.
   nodeEnter.transition()
