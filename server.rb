@@ -13,3 +13,7 @@ get '/post' do
 	content_type :json
 	`python pyparse.py #{query}`
 end
+
+configure do
+    set :port, 80
+end
