@@ -178,17 +178,15 @@
 						rows.push("<tr><td>"+e+"</td></tr>");
 					});
 
-					if (d.type === "select") {
+					if (d.type.toLowerCase() === "select") {
 	                    if (d.where) {
       						rows.push("<tr><th class='extra'>"+"WHERE"+"</th></tr>");
-      						rows.push("<tr><td>"+d.where.items[0].name+"</td></tr>");
-      						rows.push("<tr><th class='extra'>"+d.where.operator+"</th></tr>");
-      						rows.push("<tr><td class='ignore'>"+d.where.items[1].name+"</td></tr>");
+      						rows.push("<tr><td>"+d.where+"</td></tr>");
 	                    }
 	                }
-	                if (d.type === "join" || d.type == "inner join") {
+	                if (d.type.toLowerCase() === "join" || d.type.toLowerCase() === "inner join") {
 	                	rows.push("<tr><th class='extra'>"+"ON"+"</th></tr>");
-	                	rows.push("<tr><td class='ignore'>"+d.on.items[0].name+d.on.operator+d.on.items[1].name+"</td></tr>");
+	                	rows.push("<tr><td class='ignore'>"+d.on+"</td></tr>");
 	                }
 
 					return "<table>"+rows.join("")+"</table>";
