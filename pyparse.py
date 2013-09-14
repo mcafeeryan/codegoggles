@@ -12,12 +12,11 @@ RECURSIVE_OPERATIONS = False
 
 TABLE_DEF = {
     "country": ["name", "population", "capital", "gdp", "country_code"],
-    "join": ["SELECT", "JOIN", "ON", "GROUPBY", "COUNT", "SUM", "MIN", "MAX", "FROM"],
-    "JOIN": ["SELECT", "JOIN", "ON", "GROUPBY", "COUNT", "SUM", "MIN", "MAX", "FROM"],
-    "in": [""],
+    "JOIN": ["select", "JOIN", "ON", "GROUPBY", "COUNT", "SUM", "MIN", "WHERE"],
+    "IN": ["UPDATE", "INSERT", "MAX", "FROM", "JOIN"],
     "user": ["first_name", "last_name", "country", "SSN", "password", "code"],
     "users": ["name", "country", "SSN", "password", "code"],
-    "table": ["Amount", "CustomerID", "PaymentDate", "MiscColumn"],
+    "table": ["last_name", "Amount", "CustomerID", "PaymentDate", "MiscColumn"],
     "table1": ["Amount", "CustomerID", "PaymentDate", "MiscColumn"],
     "table2": ["Amount", "CustomerID", "PaymentDate", "MiscColumn"],
 }
@@ -294,7 +293,7 @@ FROM (SELECT user.first_name, user.last_name, country.name
 FROM users
 JOIN country ON counter_code = code
 JOIN country ON country_code = code
-WHERE country.name IN ('Kazakhstan', 'Burundi'))"""
+WHERE country.name IN ('Kazakhstan', 'Burundi')) JOIN (SELECT Amount FROM table INNER JOIN user on last_name) WHERE Amount < 200"""
 
 import sys
 try:
