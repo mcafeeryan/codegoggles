@@ -14,7 +14,7 @@ TABLE_DEF = {
     "country": ["name", "population", "capital", "gdp", "country_code"],
     "JOIN": ["select", "JOIN", "ON", "GROUPBY", "COUNT", "SUM", "MIN", "WHERE"],
     "IN": ["UPDATE", "INSERT", "MAX", "FROM", "JOIN"],
-    "user": ["first_name", "last_name", "country", "SSN", "password", "code"],
+    "user": ["first_name", "last_name", "country", "code"],
     "users": ["name", "country", "SSN", "password", "code"],
     "Orders": ["last_name", "Amount", "CustomerID", "PaymentDate", "MiscColumn"],
     "table1": ["Amount", "CustomerID", "PaymentDate", "MiscColumn"],
