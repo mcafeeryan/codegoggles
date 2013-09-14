@@ -226,7 +226,8 @@ def parse_token(tokens, token, intermediate):
     if "items" not in intermediate:
         intermediate["items"] = []
 
-    print token, repr(token)
+    if DEBUG:
+        print token, repr(token)
     intermediate["items"].append(make_literal(token))
 
 def recursive_dot_removal_dict(target_dict):
