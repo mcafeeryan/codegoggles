@@ -16,7 +16,7 @@ TABLE_DEF = {
     "IN": ["UPDATE", "INSERT", "MAX", "FROM", "JOIN"],
     "user": ["first_name", "last_name", "country", "SSN", "password", "code"],
     "users": ["name", "country", "SSN", "password", "code"],
-    "table": ["last_name", "Amount", "CustomerID", "PaymentDate", "MiscColumn"],
+    "Orders": ["last_name", "Amount", "CustomerID", "PaymentDate", "MiscColumn"],
     "table1": ["Amount", "CustomerID", "PaymentDate", "MiscColumn"],
     "table2": ["Amount", "CustomerID", "PaymentDate", "MiscColumn"],
 }
