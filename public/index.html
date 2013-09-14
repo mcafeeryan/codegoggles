@@ -53,35 +53,6 @@
                     return [{"type": "symbol", "symbol": "&#x2A1D;", "_children": node.items}];
                 }
             }
-				
-
-
-            function getName(data) {
-                if (data.type === "select") {
-                    s = "<b>SELECT</b>"
-                    if (data.where) {
-                        s += " WHERE "
-                        s += "<span class='identifier'>"+data.where.items[0].name+"</span>"
-                        s += " "
-                        s += data.where.operator
-                        s += " "
-                        s += "<span class='identifier'>"+data.where.items[1].name+"</span>"
-                    }
-                }
-                if (data.type === "join") {
-                    s = "<b>JOIN</b> ON "
-                    s += "<span class='identifier'>"+data.on.items[0].table
-                    s += "."
-                    s += data.on.items[0].name+"</span>"
-                    s += " "
-                    s += data.on.operator
-                    s += " "
-                    s += "<span class='identifier'>"+data.on.items[1].table
-                    s += "."
-                    s += data.on.items[1].name+"</span>"
-                }
-                return s
-            }
 
 			function getCols(d) {
 				if (d._cols) return d._cols;
