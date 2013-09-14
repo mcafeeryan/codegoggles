@@ -57,7 +57,34 @@
 			};
 			
 			var container, svg, tree;
-			
+		
+            function getName(data) {
+                if (data.type === "select") {
+                    s = "SELECT"
+                    if (data.where) {
+                        s += " WHERE "
+                        s += data.where.items[0].name
+                        s += " "
+                        s += data.where.operator
+                        s += " "
+                        s += data.where.items[1].name
+                    }
+                }
+                if (data.type === "join") {
+                    s = "JOIN ON "
+                    s += data.on.items[0].table
+                    s += "."
+                    s += data.on.items[0].name
+                    s += " "
+                    s += data.on.operator
+                    s += " "
+                    s += data.on.items[1].table
+                    s += "."
+                    s += data.on.items[1].name
+                }
+                return s
+            }
+
 			function getCols(d) {
 				if (d._cols) return d._cols;
 				
@@ -101,9 +128,9 @@
 					var rows = [];
 					switch (d.type) {
 					case "join":
-						rows.push("<tr><th class='transient'>joined</th></tr>"); break;
+						rows.push("<tr><th class='transient'>" + getName(d) + "</th></tr>"); break;
 					case "select":
-						rows.push("<tr><th class='transient'>filtered</th></tr>"); break;
+						rows.push("<tr><th class='transient'>" + getName(d) + "</th></tr>"); break;
 					case "table":
 						rows.push("<tr><th>"+d.name+"</th></tr>");
 					}
