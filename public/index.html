@@ -5,15 +5,15 @@
 		<script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
 		<script type="text/javascript">
 
-            var magic_constant = 650
+            var magic_constant = 300
 			var container, svg, tree;
 	
             function depth(data) {
                 var d = 0
-                if (data.type === "select") {
+                    if (data.type.toLowerCase().indexOf("select") >= 0) {
                     return depth(data.from) +1
                 }
-                if (data.type === "join") {
+                if (data.type.toLowerCase().indexOf("join") >= 0) {
                     for (var i = 0; i < data.items.length; i++) {
                         if (depth(data.items[i]) > d) {
                             d = depth(data.items[i])
@@ -84,6 +84,7 @@
 
 			function drawStuff(data) {
                 console.log(data)
+                console.log(depth(data))
 				$("#container").width(depth(data)*magic_constant)
                 $("#container").empty()
 				container = d3.select("#container");
