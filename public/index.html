@@ -134,6 +134,7 @@
 						rows.push("<tr><th class='transient'>" + d.type.toUpperCase() + "ED</th></tr>"); break;
 					case "table":
 					case "column":
+					case "literal":
 						rows.push("<tr><th><span class='identifier'>"+d.name+"</span></th></tr>");
 
 					}
@@ -195,32 +196,47 @@
 			    });
 			}
 	
-			// $(function() {
-			// 	drawStuff(query);
-			// });
+			$(function() {
+				
+				var qnum = 0;
+				var qs = ["SELECT user.first_name, user.last_name, country.name\nFROM user\nJOIN country ON country_code = code\nWHERE country.name IN ('Kazakhstan', 'Burundi')", "SELECT country.name, Amount, SSN\nFROM (SELECT country.name\nFROM user\nOUTER JOIN country ON country_code = code\nWHERE country.name IN ('Kazakhstan', 'Burundi')) \nJOIN (SELECT Amount, last_name, SSN FROM Orders INNER JOIN users) \nON last_name = name WHERE Amount < 200"];
+				$("#head").click(function() {
+					$("#input").text(qs[qnum%qs.length]);
+					qnum += 1;
+				})
+				
+				$("#export").click(function() {
+					openModal(function(text) {
+						$("#output").text(text);
+						$("#openModal").addClass("visible");
+					});
+					return false;
+				});
+				$("#close").click(function() {
+					$("#openModal").removeClass("visible");
+					return false;
+				});
+			});
 
 			function formSubmit() {
 				var text = $("#input").val();
 				console.log(text);
 				var response = $.ajax({
 					type: 'GET',
-					url: "http://localhost/post?sql=".concat(text.replace(/\n/g, " "))
+					url: "/post?sql=".concat(text.replace(/\n/g, " "))
 				}).done(function (uniqData) {
 					console.log(JSON.stringify(uniqData));
 					drawStuff(uniqData);
 				});
 			}
-			function openModal() {
+			function openModal(callback) {
 				var text = $("#input").val();
-				console.log(text);
-				var ret = "";
 				var response = $.ajax({
 					type: 'GET',
-					url: "http://localhost/post?sql=".concat(text.replace(/\n/g, " "))
+					url: "/post?sql=".concat(text.replace(/\n/g, " "))
 				}).done(function (uniqData) {
-					ret = JSON.stringify(uniqData);
+					callback(JSON.stringify(uniqData, undefined, 2));
 				});
-				return ret;
 			}
 
 		</script>
@@ -254,7 +270,7 @@
 			}
 			textarea {
 				width: 90%;
-				height: 7em;
+				height: 13em;
 				vertical-align: top;
 				font-family: Consolas, monospace;
 			}
@@ -264,7 +280,7 @@
 			}
 			path.link {
 				fill: none;
-				stroke: #ccc;
+				stroke: #666;
 				stroke-width: 2px;
 			}
 			.symbol {
@@ -284,12 +300,14 @@
 				line-height: 1.1em;
 				text-align: center;
 				font-family: Consolas, monospace;
+				background-color: white;
 			}
 			#container {
 				position: relative;
 				width: 80%;
 				height: 100%;
 				margin-left: 150px;
+				margin-bottom: 50px;
 			}
 			table {
 				border: 1px solid #ccc;
@@ -303,7 +321,7 @@
 				padding-left: 10px;
 				padding-right: 10px;
 				padding: 3px;
-				border: 1px solid #ccc;
+				border: 1px solid #999;
 				background-color: #fff;
 			}
 			td, .identifier {
@@ -335,12 +353,12 @@
 			}
 			.modalDialog {
 				position: fixed;
-				font-family: Arial, Helvetica, sans-serif;
+				font-family: Helvetica, Arial, sans-serif;
 				top: 0;
 				right: 0;
 				bottom: 0;
 				left: 0;
-				background: rgba(0,0,0,0.8);
+				background: rgba(0,0,0,0.4);
 				z-index: 99999;
 				opacity:0;
 				-webkit-transition: opacity 400ms ease-in;
@@ -348,13 +366,16 @@
 				transition: opacity 400ms ease-in;
 				pointer-events: none;
 			}
-			.modalDialog:target {
+			.modalDialog.visible {
 				opacity:1;
 				pointer-events: auto;
 			}
-
+			.modalDialog textarea {
+				font-size: 0.8em;
+				height: 350px;
+			}
 			.modalDialog > div {
-				width: 400px;
+				width: 600px;
 				position: relative;
 				margin: 10% auto;
 				padding: 5px 20px 13px 20px;
@@ -370,11 +391,7 @@
 		<div id="top">
 			<div id="head"><img src="logo.png" id="logo"><h1>SQL Goggles</h1></div>
 			<div id="interaction" align="right">
-			<textarea id="input" rows="8" cols="40">
-SELECT user.first_name, user.last_name, country.name
-FROM user
-JOIN country ON country_code = code
-WHERE country.name IN ('Kazakhstan', 'Burundi')</textarea>
+			<textarea id="input" rows="8" cols="40"></textarea>
 <br>
 			<input type="button" onClick="formSubmit()" id="submit" value="Go!" class="btn btn-primary btn-large">
 			<input type="button" onClick="" id="export" value="Export" class="btn btn-primary btn-large">
@@ -383,7 +400,7 @@ WHERE country.name IN ('Kazakhstan', 'Burundi')</textarea>
 
 		<div id="openModal" class="modalDialog">
 	<div>
-		<a href="#close" title="Close" class="close">X</a>
+		<a id="close" href="#" title="Close" class="close">X</a>
 		<h2>JSON Object</h2>
 		<textarea id="output" rows="8" cols="40">
 		</textarea>
