@@ -27,6 +27,7 @@
                 if (node._children) return node._children;
                 switch (node.type.toLowerCase()) {
                 case "select":
+					if (!node.where) return [{"type": "symbol", "symbol": "&pi;", "_children": [node.from]}];
                     return [{"type": "symbol", "symbol": "&sigma;", "_children": [node.from]}];
                 case "join":
                 case "inner join":
