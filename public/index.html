@@ -89,10 +89,11 @@
 				switch (d.type.toLowerCase()) {
 				case "join":
                 case "inner join":
-                    if (!d.on) {
+                    d._cols = []
+                    if (!d.on || !d.on.items) {
                         d._cols = getCols(d.parent.parent)
                         for (var i = 0; i < d._cols.length; i++) {
-                            if (d._cols[i].indexOf("*") >= 0) {
+                            if (d._cols[i] && d._cols[i].indexOf("*") >= 0) {
                                 d._cols.splice(i, 1)
                             }
                         }
