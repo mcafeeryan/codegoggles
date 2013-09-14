@@ -314,13 +314,17 @@
 	<body>
 		<div id="top">
 			<div id="head"><img src="logo.png" id="logo"><h1>SQL Goggles</h1></div>
+			<div id="interaction" align="right">
 			<textarea id="input" rows="8" cols="40">
 SELECT user.first_name, user.last_name, country.name
 FROM user
 JOIN country ON country_code = code
 WHERE country.name IN ('Kazakhstan', 'Burundi')</textarea>
+<br>
 			<input type="button" onClick="formSubmit()" id="submit" value="Go!" class="btn btn-primary btn-large">
 			<input type="button" id="expandall" value="Minimize All" class="btn btn-primary btn-large">
+			<input type="button" onClick="formExport()" id="export" value="Export" class="btn btn-primary btn-large">
+	</div>
 		</div>
 		</div>
 		<div id="container"></div>
