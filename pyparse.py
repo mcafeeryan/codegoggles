@@ -203,7 +203,7 @@ def parse_token(tokens, token, intermediate):
 
     if "from" == str(token).lower():
         # TODO special case join
-        if is_join(token.tokens[0]):
+        if is_join(token.tokens[0]) or "Parenthesis" in repr(token.tokens[0]):
             intermediate['from'] = create_dict(token, {"type": "table"}, False)
         else:
             intermediate['from'] = make_table(token.tokens[0])
@@ -290,7 +290,14 @@ if 0:
 
 sample = """SELECT user.first_name, user.last_name, country.name
 FROM (SELECT user.first_name, user.last_name, country.name
-FROM users)
+FROM users
+JOIN country ON counter_code = code
+JOIN country ON country_code = code
+WHERE country.name IN ('Kazakhstan', 'Burundi'))"""
+
+sample2 = """SELECT user.first_name, user.last_name, country.name
+FROM users
+JOIN country ON counter_code = code
 JOIN country ON country_code = code
 WHERE country.name IN ('Kazakhstan', 'Burundi')"""
 
