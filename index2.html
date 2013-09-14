@@ -57,7 +57,34 @@
 			};
 			
 			var container, svg, tree;
-			
+		
+            function getName(data) {
+                if (data.type === "select") {
+                    s = "SELECT"
+                    if (data.where) {
+                        s += " WHERE "
+                        s += data.where.items[0].name
+                        s += " "
+                        s += data.where.operator
+                        s += " "
+                        s += data.where.items[1].name
+                    }
+                }
+                if (data.type === "join") {
+                    s = "JOIN ON "
+                    s += data.on.items[0].table
+                    s += "."
+                    s += data.on.items[0].name
+                    s += " "
+                    s += data.on.operator
+                    s += " "
+                    s += data.on.items[1].table
+                    s += "."
+                    s += data.on.items[1].name
+                }
+                return s
+            }
+
 			function getCols(d) {
 				if (d._cols) return d._cols;
 				
@@ -75,18 +102,22 @@
 			$(function() {
 				container = d3.select("#container");
 				
+				var width = $(container[0]).width()*0.7;
+				var height = $(container[0]).height();
+				
 				svg = container.append("svg:svg")
-				.attr("width", $(container[0]).width())
-				.attr("height", $(container[0]).height());
+				.attr("width", width)
+				.attr("height", height);
 			
 				tree = d3.layout.tree()
-				.size([$(container[0]).height(), $(container[0]).width()])
+				.size([height, width])
 				.children(function(node) {
+					if (node._children) return node._children;
 					switch (node.type) {
 					case "select":
-						return [node.from];
+						return [{"type": "symbol", "symbol": "&pi;", "_children": [node.from]}];
 					case "join":
-						return node.items;
+						return [{"type": "symbol", "symbol": "&#x2A1D;", "_children": node.items}];
 					}
 				});
 				
@@ -100,10 +131,12 @@
 				.html(function(d) {
 					var rows = [];
 					switch (d.type) {
+					case "symbol":
+						return "<span class='symbol'>"+d.symbol+"</span>";
 					case "join":
-						rows.push("<tr><th class='transient'>joined</th></tr>"); break;
+						rows.push("<tr><th class='transient'>" + getName(d) + "</th></tr>"); break;
 					case "select":
-						rows.push("<tr><th class='transient'>filtered</th></tr>"); break;
+						rows.push("<tr><th class='transient'>" + getName(d) + "</th></tr>"); break;
 					case "table":
 						rows.push("<tr><th>"+ d.name+"</th></tr>");
 					}
@@ -168,21 +201,36 @@
 				fill: none;
 				stroke: #ccc;
 			}
+			.symbol {
+				line-height: 1em;
+				font-size: 2em;
+				margin: -0.6em 0em 0em -0.5em;
+				padding: 2px;
+				background-color: white;
+				display: block;
+				font-family: Georgia, serif;
+			}
 			#container {
 				position: relative;
-				width: 600px;
-				height: 500px;
-				margin: 0px auto;
-				border: 1px solid #ccc;
+				width: 80%;
+				height: 100%;
+				margin: 0em auto;
+				/*border: 1px solid #ccc;*/
 			}
 			table {
+				/*width: 100%;*/
 				border: 1px solid #ccc;
 				font-size: 0.8em;
 				border-collapse: collapse;
+				margin: -3em 0em 0em -50%;
+				display: block;
 			}
 			th, td {
 				padding: 1px;
+				padding-left: 10px;
+				padding-right: 10px;
 				border: 1px solid #eee;
+				background-color: #fff;
 			}
 			th {
 				text-transform: uppercase;
@@ -190,10 +238,10 @@
 
 			}
 			th.transient {
-				font-weight: normal;
+				font-weight: bold;
 				text-transform: none;
-				font-style: italic;
-				color: #fff;
+				font-style: none;
+				color: #aa0a0a;
 			}
 			.highlight_tr {
 				background-color: yellow;
