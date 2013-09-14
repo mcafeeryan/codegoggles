@@ -14,7 +14,8 @@ TABLE_DEF = {
     "country": ["name", "population", "capital", "gdp", "country_code"],
     "join": ["SELECT", "JOIN", "ON", "GROUPBY", "COUNT", "SUM", "MIN", "MAX", "FROM"],
     "JOIN": ["SELECT", "JOIN", "ON", "GROUPBY", "COUNT", "SUM", "MIN", "MAX", "FROM"],
-    "user": ["name", "country", "SSN", "password", "code"],
+    "in": [""],
+    "user": ["first_name", "last_name", "country", "SSN", "password", "code"],
     "users": ["name", "country", "SSN", "password", "code"],
     "table": ["Amount", "CustomerID", "PaymentDate", "MiscColumn"],
     "table1": ["Amount", "CustomerID", "PaymentDate", "MiscColumn"],
@@ -294,12 +295,6 @@ FROM users
 JOIN country ON counter_code = code
 JOIN country ON country_code = code
 WHERE country.name IN ('Kazakhstan', 'Burundi'))"""
-
-sample2 = """SELECT user.first_name, user.last_name, country.name
-FROM users
-JOIN country ON counter_code = code
-JOIN country ON country_code = code
-WHERE country.name IN ('Kazakhstan', 'Burundi')"""
 
 import sys
 try:
