@@ -11,7 +11,7 @@ end
 get '/post' do
 	query = params["sql"]
 	content_type :json
-	`python pyparse.py #{query}`
+	`python pyparse.py \"#{query}\"`
 end
 
 configure do

@@ -25,6 +25,38 @@
 				]}
 			]};
 
+			var query2 = {
+				"type": "select",
+				"items": [
+					{"type": "column", "table": "user", "name": "first_name"},
+					{"type": "column", "table": "user", "name": "last_name"},
+					{"type": "column", "table": "country", "name": "name"}
+				],
+				"from": {
+					"type": "join",
+					"items": [
+						{"type": "table", "name": "user", "columns": ["first_name", "last_name", "country_code", "age"]},
+						{"type": "table", "name": "country", "columns": ["code", "name"]}
+					],
+					"on": {
+						"type": "relation",
+						"operator": "=",
+						"items": [
+							{"type": "column", "table": "user", "name": "country_code"},
+							{"type": "column", "table": "country", "name": "code"}
+						]
+					}
+				},
+				"where": {
+					"type": "relation",
+					"operator": "IN",
+					"items": [
+						{"type": "column", "table": "country", "name": "name"},
+						{"type": "literal", "name": "('Kazakhstan', 'Burundi')"}
+					]
+				}
+			};
+
             var magic_constant = 400
 			var container, svg, tree;
 	
@@ -243,11 +275,11 @@
 			// });
 
 			function formSubmit() {
-				var text = $("#input").text();
+				var text = $("#input").val();
 				console.log(text);
 				var response = $.ajax({
 					type: 'GET',
-					url: "http://localhost/post?=".concat(text)
+					url: "http://localhost/post?sql=".concat(text)
 				}).done(function (uniqData) {
 					console.log(JSON.stringify(uniqData));
 					drawStuff(uniqData);
@@ -368,11 +400,7 @@
 	<body>
 		<div id="top">
 			<div id="head"><img src="logo.png" id="logo"><h1>SQL Goggles</h1></div>
-			<textarea id="input" rows="8" cols="40">
-SELECT user.first_name, user.last_name, country.name
-FROM user
-JOIN country ON user.country_code = country.code
-WHERE country.name IN ('Kazakhstan', 'Burundi')</textarea>
+			<textarea id="input" rows="8" cols="40"></textarea>
 			<input type="button" onClick="formSubmit()" id="submit" value="Go!" class="btn btn-primary btn-large">
 
 			<input type="button" id="expandall" value="Expand All" class="btn btn-primary btn-large">
