@@ -55,9 +55,25 @@
 					]
 				}
 			};
-			
+
+            var magic_constant = 400
 			var container, svg, tree;
-		
+	
+            function depth(data) {
+                var d = 0
+                if (data.type === "select") {
+                    return depth(data.from) +1
+                }
+                if (data.type === "join") {
+                    for (var i = 0; i < data.items.length; i++) {
+                        if (depth(data.items[i]) > d) {
+                            d = depth(data.items[i])
+                        }
+                    }
+                }
+                return d+1
+            }
+
             function getName(data) {
                 if (data.type === "select") {
                     s = "<b>SELECT</b>"
@@ -90,9 +106,21 @@
 				
 				switch (d.type) {
 				case "join":
-					d._cols = getCols(d.items[0]).concat(getCols(d.items[1])); break;
+					var cols = [].concat(getCols(d.items[0]));
+					cols.splice(cols.indexOf(d.on.items[0].name), 1);
+					var mid = cols.length;
+					cols = cols.concat(getCols(d.items[1]))
+					cols.splice(cols.indexOf(d.on.items[1].name), 1);
+					cols.splice(mid, 0, d.on.items[0].name+","+d.on.items[1].name);
+					cols = cols;
+					d._cols = cols;
+					break;
 				case "select":
-					d._cols = getCols(d.from); break;
+					var cols = [];
+					for (var i = 0; i < d.items.length; i++) {
+						cols.push(d.items[i].name);
+					}
+					d._cols = cols; break;
 				case "table":
 					d._cols = d.columns; break;
 				}
@@ -100,6 +128,7 @@
 			}
 			
 			$(function() {
+                $("#container").width(depth(query)*magic_constant)
 				container = d3.select("#container");
 				
 				var width = $(container[0]).width()*0.7;
@@ -173,11 +202,19 @@
 				  $(this).parent().addClass('highlight_tr');
 
 				  var text = $(this).parent().find('td').text();
+				  var strSplit = text.split(",");
 
 				  $('td').each(function(){
-				  	console.log($(this).text());
-				  	if($(this).text() === text) {
-				  		$(this).addClass('highlight_tr');
+				  	for (var i = 0; i < strSplit.length; i++) {
+					  	if($(this).text() === strSplit[i]) {
+					  		$(this).addClass('highlight_tr');
+					  	}
+
+					  	if($(this).text() === text)	{
+					  		$(this).addClass('highlight_tr');
+					  	}
+
+
 				  	}
 				  });
 
@@ -185,12 +222,20 @@
 				  $(this).parent().removeClass('highlight_tr');
 
 				  var text = $(this).parent().find('td').text();
+				  var strSplit = text.split(",");
 
 				  $('td').each(function(){
-				  	console.log($(this).text());
-				  	if($(this).text() === text) {
+				  	for (var i = 0; i < strSplit.length; i++) {
+					  	if($(this).text() === strSplit[i]) {
+					  		$(this).removeClass('highlight_tr');
+					  	}					
+				  	}
+
+				  	if($(this).text() === text)	{
 				  		$(this).removeClass('highlight_tr');
 				  	}
+
+				  	
 				  });
 				}
 				);
