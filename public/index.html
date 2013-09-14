@@ -83,6 +83,7 @@
 			}
 
 			function drawStuff(data) {
+                console.log(data)
 				$("#container").width(depth(data)*magic_constant)
                 $("#container").empty()
 				container = d3.select("#container");
@@ -316,7 +317,7 @@
 			<textarea id="input" rows="8" cols="40">
 SELECT user.first_name, user.last_name, country.name
 FROM user
-JOIN country ON user.country_code = country.code
+JOIN country ON country_code = code
 WHERE country.name IN ('Kazakhstan', 'Burundi')</textarea>
 			<input type="button" onClick="formSubmit()" id="submit" value="Go!" class="btn btn-primary btn-large">
 			<input type="button" id="expandall" value="Minimize All" class="btn btn-primary btn-large">
