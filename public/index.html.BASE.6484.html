@@ -138,7 +138,7 @@ var query = {
 				}
 			};
 
-            var magic_constant = 600
+            var magic_constant = 400
 			var container, svg, tree;
 	
             function depth(data) {
@@ -160,11 +160,40 @@ var query = {
                 if (node._children) return node._children;
                 switch (node.type.toLowerCase()) {
                 case "select":
-                    return [{"type": "symbol", "symbol": "&sigma;", "_children": [node.from]}];
+                    return [{"type": "symbol", "symbol": "&pi;", "_children": [node.from]}];
                 case "join":
                 case "inner join":
                     return [{"type": "symbol", "symbol": "&#x2A1D;", "_children": node.items}];
                 }
+            }
+				
+
+
+            function getName(data) {
+                if (data.type === "select") {
+                    s = "<b>SELECT</b>"
+                    if (data.where) {
+                        s += " WHERE "
+                        s += "<span class='identifier'>"+data.where.items[0].name+"</span>"
+                        s += " "
+                        s += data.where.operator
+                        s += " "
+                        s += "<span class='identifier'>"+data.where.items[1].name+"</span>"
+                    }
+                }
+                if (data.type === "join") {
+                    s = "<b>JOIN</b> ON "
+                    s += "<span class='identifier'>"+data.on.items[0].table
+                    s += "."
+                    s += data.on.items[0].name+"</span>"
+                    s += " "
+                    s += data.on.operator
+                    s += " "
+                    s += "<span class='identifier'>"+data.on.items[1].table
+                    s += "."
+                    s += data.on.items[1].name+"</span>"
+                }
+                return s
             }
 
 			function getCols(d) {
@@ -173,16 +202,21 @@ var query = {
 				switch (d.type.toLowerCase()) {
 				case "join":
                 case "inner join":
-					var joinItems = d.on.split("=");
-					for (var i = 0; i < joinItems.length; i++) {
-						joinItems[i] = joinItems[i].trim();
-					}
+                    if (!d.on) {
+                        d._cols = getCols(d.parent.parent)
+                        for (var i = 0; i < d._cols.length; i++) {
+                            if (d._cols[i].indexOf("*") >= 0) {
+                                d._cols.splice(i, 1)
+                            }
+                        }
+                        break
+                    }
 					var cols = [].concat(getCols(d.items[0]));
-					cols.splice(cols.indexOf(joinItems[0]), 1);
+					cols.splice(cols.indexOf(d.on.items[0].name), 1);
 					var mid = cols.length;
 					cols = cols.concat(getCols(d.items[1]))
-					cols.splice(cols.indexOf(joinItems[1]), 1);
-					cols.splice(mid, 0, joinItems[0]+","+joinItems[1]);
+					cols.splice(cols.indexOf(d.on.items[1].name), 1);
+					cols.splice(mid, 0, d.on.items[0].name+","+d.on.items[1].name);
 					cols = cols;
 					d._cols = cols;
 					break;
@@ -214,9 +248,9 @@ var query = {
 				}
 				return d._cols;
 			}
-
-			function drawStuff(data) {
-				$("#container").width(depth(data)*magic_constant)
+			
+			$(function() {
+                $("#container").width(depth(query)*magic_constant)
 				container = d3.select("#container");
 				
 				var width = $(container[0]).width()*0.7;
@@ -228,13 +262,12 @@ var query = {
 			
 				tree = d3.layout.tree()
 				.size([height, width])
-
 				.children(calc_children)
                    
-				var nodes = tree.nodes(data);
+				var nodes = tree.nodes(query);
 				var links = tree.links(nodes);
 				
-				container.selectAll("div.node").data(tree.nodes(data))
+				container.selectAll("div.node").data(tree.nodes(query))
 				.enter().append("div").attr("class", "node")
 				.style("left", function(d) { return tree.size()[1]-d.y; })
 				.style("top", function(d) { return d.x; })
@@ -256,15 +289,17 @@ var query = {
 						rows.push("<tr><td>"+e+"</td></tr>");
 					});
 
-					if (d.type.toLowerCase() === "select") {
+					if (d.type === "select") {
 	                    if (d.where) {
       						rows.push("<tr><th class='extra'>"+"WHERE"+"</th></tr>");
-      						rows.push("<tr><td>"+d.where+"</td></tr>");
+      						rows.push("<tr><td>"+d.where.items[0].name+"</td></tr>");
+      						rows.push("<tr><th class='extra'>"+d.where.operator+"</th></tr>");
+      						rows.push("<tr><td class='ignore'>"+d.where.items[1].name+"</td></tr>");
 	                    }
 	                }
-	                if (d.type.toLowerCase() === "join" || d.type.toLowerCase() === "inner join") {
+	                if (d.type === "join" || d.type == "inner join") {
 	                	rows.push("<tr><th class='extra'>"+"ON"+"</th></tr>");
-	                	rows.push("<tr><td class='ignore'>"+d.on+"</td></tr>");
+	                	rows.push("<tr><td class='ignore'>"+d.on.items[0].name+d.on.operator+d.on.items[1].name+"</td></tr>");
 	                }
 
 					return "<table>"+rows.join("")+"</table>";
@@ -313,24 +348,6 @@ var query = {
 				  });
 				}
 				);
-			}
-	
-			// $(function() {
-			// 	drawStuff(query);
-			// });
-
-			function formSubmit() {
-				var text = $("#input").text();
-				console.log(text);
-				var response = $.ajax({
-					type: 'GET',
-					url: "http://localhost/post?=".concat(text)
-				}).done(function (uniqData) {
-					console.log(JSON.stringify(uniqData));
-					drawStuff(uniqData);
-				});
-			}
-
 				// $('.node td').hide();
 				$('th').click(function() {
 			       $(this).parents('table').find('td').toggle();
@@ -338,6 +355,7 @@ var query = {
 			    $('#expandall').click(function(){
 			    	$('td').toggle();
 			    });
+			});
 
 		</script>
 		<style type="text/css" media="screen">
@@ -451,8 +469,7 @@ FROM user
 JOIN country ON user.country_code = country.code
 WHERE country.name IN ('Kazakhstan', 'Burundi')</textarea>
 			<input type="button" id="submit" value="Go!" class="btn btn-primary btn-large">
-			<input type="button" id="expandall" value="Minimize All" class="btn btn-primary btn-large">
-		</div>
+			<input type="button" id="expandall" value="Expand All" class="btn btn-primary btn-large">
 		</div>
 		<div id="container"></div>
 	</body>
