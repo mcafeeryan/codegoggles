@@ -164,15 +164,30 @@
 					case "symbol":
 						return "<span class='symbol'>"+d.symbol+"</span>";
 					case "join":
-						rows.push("<tr><th class='transient'>" + getName(d) + "</th></tr>"); break;
+						rows.push("<tr><th class='transient'>" + d.type.toUpperCase() + "</th></tr>"); break;
 					case "select":
-						rows.push("<tr><th class='transient'>" + getName(d) + "</th></tr>"); break;
+						rows.push("<tr><th class='transient'>" + d.type.toUpperCase() + "</th></tr>"); break;
 					case "table":
 						rows.push("<tr><th><span class='identifier'>"+d.name+"</span></th></tr>");
+
 					}
 					$.each(getCols(d), function(i, e) {
 						rows.push("<tr><td>"+e+"</td></tr>");
 					});
+
+					if (d.type === "select") {
+	                    if (d.where) {
+      						rows.push("<tr><th class='transient'>"+"WHERE"+"</th></tr>");
+      						rows.push("<tr><td>"+d.where.items[0].name+"</td></tr>");
+      						rows.push("<tr><th class='transient'>"+d.where.operator+"</th></tr>");
+      						rows.push("<tr><td>"+d.where.items[1].name+"</td></tr>");
+	                    }
+	                }
+	                if (d.type === "join") {
+	                	rows.push("<tr><th class='transient'>"+"ON"+"</th></tr>");
+	                	rows.push("<tr><td>"+d.on.items[0].name+d.on.operator+d.on.items[1].name+"</td></tr>");
+	                }
+
 					return "<table>"+rows.join("")+"</table>";
 				})
 				
@@ -294,9 +309,9 @@
 			}
 			th.transient {
 				background-color: #4c8;
-				font-weight: normal;
+				font-weight: bold;
 				text-transform: none;
-				font-style: italic;
+				font-style: none;
 			}
 			.highlight_tr {
 				background-color: yellow;
